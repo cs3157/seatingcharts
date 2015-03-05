@@ -6,11 +6,11 @@
 # This "tool" takes 3 inputs:
 # 1) a list of seats, in order of preference, with optionally ignored blank lines and repeats allowed
 #    basically tab/newline separated, with no difference between them
-SEATS_IN_ORDER = "pupin301_ordered.txt"
+SEATS_IN_ORDER_LIST = ["pupin301_ordered.txt"]
 
 # 2) a CSV list of students, one per line. assumed that the key is the first column, name second. 
 # ie what you get if you download a gradebook from courseworks
-STUDENT_LIST = "gradebook-COMSW3157_001_2014_3-10-13-14.csv"
+STUDENT_LIST_LIST = ["roster_3157.csv"]
 
 # two lists, of students to assign first and last
 ASSIGN_FIRST = "assign_first.txt"
@@ -46,45 +46,49 @@ from bs4 import BeautifulSoup
 
 # In[42]:
 
-seats = file(SEATS_IN_ORDER).readlines()
-seats = list(itertools.chain.from_iterable([z.strip().split("\t") for z in seats]))
+assignments = {}
+lustudents = {}
+for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
+    seats = file(SEATS_IN_ORDER).readlines()
+    seats = list(itertools.chain.from_iterable([z.strip().split("\t") for z in seats]))
 
 
 # In[43]:
 
-assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
-assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
+    assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
+    assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
 
 
 # In[44]:
 
-students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][1:]
-random.shuffle(students)
+    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][1:]
+    random.shuffle(students)
+    for s in students:
+        lustudents[s[0]] = s
 
-reassign = [x for x in students if x[0] in assign_last]
-for x in reassign:
-    students.remove(x)
-students.extend(reassign)
-students.reverse()
+    reassign = [x for x in students if x[0] in assign_last]
+    for x in reassign:
+        students.remove(x)
+    students.extend(reassign)
+    students.reverse()
 
-reassign = [x for x in students if x[0] in assign_first]
-for x in reassign:
-    students.remove(x)
-students.extend(reassign)
+    reassign = [x for x in students if x[0] in assign_first]
+    for x in reassign:
+        students.remove(x)
+    students.extend(reassign)
 
-students
 
 
 # In[45]:
 
-assignments = {}
-for seat in seats:
-    if seat and seat not in assignments:
-        try:
-            assignments[seat] = students.pop()
-        except:
-            break
-        print "assigned", assignments[seat], "to", seat
+    for seat in seats:
+        if seat and seat not in assignments:
+            try:
+                assignments[seat] = students.pop()
+            except:
+                break
+            print "assigned", assignments[seat], "to", seat
+    print "Leaving unassigned:", students
 
 
 # In[46]:
@@ -113,8 +117,12 @@ with open(OUTPUT_HTML, "w") as html:
 
 # In[47]:
 
-len(assignments)
-len(set(seats))
+print len(assignments)
+print len(set(seats))
+
+output = csv.writer(open(OUTPUT_CSV, "w"))
+for seat, uni in assignments.iteritems():
+    output.writerow(list(uni)[:2] + [seat])
 
 
 # In[48]:
@@ -168,9 +176,13 @@ with open(OUTPUT_CHART, "w") as html:
                 student = assignments[seat]
                 uni = student[0]
                 name = student[1]
-                photo = photos[uni]
-                html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
+                try:
+                    photo = photos[uni]
+                    html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
                            % (seat, uni, name, photo))
+                except KeyError:
+                    html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> """
+                           % (seat, uni, name))
             except KeyError:
                 html.write("""<span class="seat">%s</span>""" % (seat))
             html.write("</td>\n")
@@ -179,24 +191,6 @@ with open(OUTPUT_CHART, "w") as html:
 
             
             
-
-
-# In[51]:
-
-
-
-
-# In[51]:
-
-
-
-
-# In[51]:
-
-
-
-
-# In[51]:
 
 
 
