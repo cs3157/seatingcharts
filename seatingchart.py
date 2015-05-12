@@ -34,17 +34,11 @@ OUTPUT_HTML = "assigned_seats.html"
 OUTPUT_CHART = "assigned_seats_chart.html"
 
 
-# In[41]:
-
-import pandas
-import numpy
 import itertools
 import csv
 import random
 from bs4 import BeautifulSoup
 
-
-# In[42]:
 
 assignments = {}
 lustudents = {}
@@ -53,13 +47,9 @@ for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_
     seats = list(itertools.chain.from_iterable([z.strip().split("\t") for z in seats]))
 
 
-# In[43]:
-
     assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
     assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
 
-
-# In[44]:
 
     students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][1:]
     random.shuffle(students)
@@ -79,8 +69,6 @@ for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_
 
 
 
-# In[45]:
-
     for seat in seats:
         if seat and seat not in assignments:
             try:
@@ -90,8 +78,6 @@ for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_
             print "assigned", assignments[seat], "to", seat
     print "Leaving unassigned:", students
 
-
-# In[46]:
 
 with open(OUTPUT_HTML, "w") as html:
     html.write("""<style>
@@ -107,15 +93,19 @@ with open(OUTPUT_HTML, "w") as html:
                 -moz-column-count: 4; /* Firefox */
                 column-count: 4;
             }
+            h3 {
+                text-align: center;
+            }
             </style>
-    <body><div class="assignments">\n\n""")
+    <body>
+    <h3>CS3157 Exam</h3>
+    <div class="assignments">\n\n""")
     for seat, student in sorted(assignments.iteritems(), key=lambda x: x[1]):
         html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
                    % (student[0], seat))
     html.write("""</div></body>\n""")
 
 
-# In[47]:
 
 print len(assignments)
 print len(set(seats))

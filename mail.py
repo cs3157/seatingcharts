@@ -1,4 +1,4 @@
-import csv, sys
+import csv, sys, os
 from subprocess import call, Popen, PIPE
 import time
 
@@ -18,10 +18,13 @@ filename = sys.argv[1]
 
 students = csv.reader(open(filename))
 
+#set mutt parameter
+os.environ["REPLYTO"] = "cucs3157-tas@googlegroups.com"
+
 for uni, name, seat in students:
-    msg = "3157 Midterm: You are assigned seat %s."
+    msg = "3157 exam: You are assigned seat %s."
     print uni, msg % seat
-    mutt = Popen(["mutt", "-s", msg % seat, "%s@columbia.edu" % uni], stdin=PIPE)
+    mutt = Popen(["mutt", "-s", msg % seat, "%s@columbia.edu" % uni], stdin=PIPE, env=dict(os.environ, REPLYTO="cucs3157-tas@googlegroups.com"))
     mutt.communicate(msg % seat)
     time.sleep(1)
 
