@@ -26,9 +26,10 @@ How To Use
  * Go to Courseworks, Import Grades, Download Template as CSV -- this is our list of students
  * Go to Courseworks, Roster, Print as Single Column. Do a Chrome, "Save as Webpage Complete" to save it to Roster Pictures.html (this also saves students pictures to a subdirectory)
  * Edit seatingchart.py to configure:
-   * SEATS_IN_ORDER_LIST to be a list of all the ORDERED seats (ie pupin301_ordered.txt).  This file is actually pretty forgiving -- it can have repeats, doesn’t care about newlines or tabs or spaces, etc. Other punctuation will probably cause problems.
+   * SEATS_IN_ORDER_LIST to be a list of all the ORDERED seats (ie pupin301_ordered.txt). This file is actually pretty forgiving -- it can have repeats, doesn’t care about newlines or tabs or spaces, etc. Other punctuation will probably cause problems.
    * STUDENT_LIST_LIST to be a list of all the csv files you want to do (in case it’s mixed exam seating). 
- * Set layout to be the layout of the classroom, ie (pupin301.txt)
+   * Set ASSIGN_FIRST and ASSIGN_LAST, if you want it, so you can control seating assignments for certain people. I've typically used it to ASSIGN_FIRST those we want to give a very specific seat to, like those who need special accomodations or we want to keep an eye on. ASSIGN_LAST I often use for students who are unlikely to arrive (eg if they're likely to do a makeup or ODS accomodation), but we want to assign a seat in case they do come, this just helps make sure the good seats aren't then left open. 
+ * Set LAYOUT to be the layout of the classroom, ie (pupin301.txt). *this is best edited in Excel or similar, where the whitespace/grid is easiest to see*
  * Run seatingchart.py (no arguments, just configure the stuff at the top of seatingchart)
 
 It will output:
