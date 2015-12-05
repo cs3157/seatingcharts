@@ -34,9 +34,7 @@ How To Use
 
 It will output:
  * assigned_seats.csv (will be fed to mail.py)
- * assigned_seats.html -- uni ordered list of suitable for printing (firefox prints best)
+ * assigned_seats.html -- uni ordered list of suitable for printing and posting at the exam (firefox prints best)
  * assigned_seats_chart.html -- this is the seating assignments in a table, where each student is placed in their assigned seat according to the layout + assignments. this should be printed in firefox with “Ignore scaling and shrink to page width”
 
-You can then use mail.py to send individual emails to students with their seat assignment (edit to change subject/message)
-
-
+You can then use mail.py to send individual emails to students with their seat assignment (edit to change subject/message). This is only tested on the CLIC lab, and is likely to run into spam issues, etc. However it seemed to get through to many students, and if it's done as a supplement to printing assigned_seats.html.
