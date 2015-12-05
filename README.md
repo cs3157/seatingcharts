@@ -6,7 +6,7 @@ See https://github.com/cs3157/seatingcharts
 
 Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming. 
 
-This python script takes a class roster, classroom layout, and some helper files to produce a random set of seating assignments. The best documentation may be comments in the script itself.
+This python script takes a class roster, classroom layout, and some helper files to produce a random set of seating assignments. The best documentation may be comments in the script itself. The only non-standard requirement is beautifulsoup4.
 
 Note, there two types of files: files about seats are tab/whitespace separated. Files with student info are CSVs. This is because I'm dumb.
 
