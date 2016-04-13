@@ -44,7 +44,7 @@ assignments = {}
 lustudents = {}
 for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
     seats = file(SEATS_IN_ORDER).readlines()
-    seats = list(itertools.chain.from_iterable([z.strip().split("\t") for z in seats]))
+    seats = list(itertools.chain.from_iterable([z.strip().split() for z in seats]))
 
     assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
     assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
@@ -84,7 +84,7 @@ with open(OUTPUT_HTML, "w") as html:
             .seat {
                 padding-left: 1em;
                 margin-bottom: .2em;
-            } 
+            }
             .name {
                 font-size: 9pt;
             }
@@ -134,13 +134,13 @@ with open(OUTPUT_CHART, "w") as html:
             img {
                 width: 60px;
                 vertical-align: text-bottom;
-                
+
             }
             .seat {
                 font-weight: bold;
                 font-size: 14pt;
                                 vetical-align: top;
-            } 
+            }
             .name {
                 font-size: 9pt;
             }
@@ -170,9 +170,3 @@ with open(OUTPUT_CHART, "w") as html:
             html.write("</td>\n")
         html.write("</tr>\n\n")
     html.write("</table></body>")
-
-            
-            
-
-
-
