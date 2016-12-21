@@ -20,8 +20,8 @@ In general the script works by:
  7. (Optionally) email students their assignment directly
 
 
-How To Use
-==========
+How To Generate Charts
+======================
 
  * Go to Courseworks, Import Grades, Download Template as CSV -- this is our list of students
  * Go to Courseworks, Roster, Print as Single Column. Do a Chrome, "Save as Webpage Complete" to save it to Roster Pictures.html (this also saves students pictures to a subdirectory)
@@ -37,4 +37,11 @@ It will output:
  * assigned_seats.html -- uni ordered list of suitable for printing and posting at the exam (firefox prints best)
  * assigned_seats_chart.html -- this is the seating assignments in a table, where each student is placed in their assigned seat according to the layout + assignments. this should be printed in firefox with “Ignore scaling and shrink to page width”
 
-You can then use mail.py to send individual emails to students with their seat assignment (edit to change subject/message). This is only tested on the CLIC lab, and is likely to run into spam issues, etc. However it seemed to get through to many students, and if it's done as a supplement to printing assigned_seats.html.
+How To Email Students
+=====================
+You can now use mail.py to send individual emails to students with their seat assignment.
+
+* If you haven't already, [generate a new device password](https://uniapp.cc.columbia.edu/acctmanage/devicepass). Note that this will invalidate your existing sessions, so you will need to sign in again.
+* `export LIONMAIL_DEVICE_PASS="abcdefg"`
+* In Google account settings, [allow less secure apps](https://cuit.columbia.edu/lionmail-allow-less-secure-apps). "Less secure" is their terminology for IMAP/SMTP clients.
+* Change the name and email in the script.

@@ -1,6 +1,10 @@
+#!/usr/bin/env python2
+
 import csv, sys, os
-from subprocess import call, Popen, PIPE
 import time
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 
 """
 expects a csv file with assignments of the form:
@@ -13,23 +17,41 @@ name is ignored. Email is sent to uni@columbia.edu.
 ADDRESS = "cucs3157-tas@googlegroups.com"
 
 #the message template, takes one variable which is replaced with the seat number
-msg = "3157 exam: You are assigned seat %s."
+subj = "AP exam"
+msg = "You are assigned seat %s."
 
 if len(sys.argv) < 2:
-    print "USAGE: %s <assignment_csv_filename>" % sys.argv[1]
+    print "USAGE: %s <assignment_csv_filename>" % sys.argv[0]
     sys.exit(1)
 
 filename = sys.argv[1]
 
 students = csv.reader(open(filename))
 
-#set mutt parameter
-os.environ["REPLYTO"] = ADDRESS
+fromaddr = "foo@columbia.edu"
+fromname = "Your Name"
 
-for uni, name, seat in students:
+server = smtplib.SMTP("smtp.gmail.com", 587)
+server.starttls()
+server.login(fromaddr, os.environ["LIONMAIL_DEVICE_PASS"])
+
+for uni, toname, seat in students:
     print uni, msg % seat
-    mutt = Popen(["mutt", "-s", msg % seat, "%s@columbia.edu" % uni], stdin=PIPE, env=dict(os.environ, REPLYTO=ADDRESS))
-    mutt.communicate(msg % seat)
-    time.sleep(1)
 
+    toaddr = "%s@columbia.edu" % uni
 
+    email = MIMEMultipart()
+    email["From"] = "%s <%s>" % (fromname, fromaddr)
+    email["To"] = "%s <%s>" % (toname, toaddr)
+    email["Subject"] = subj
+    email["Reply-To"] = ADDRESS
+
+    body = msg % seat
+    email.attach(MIMEText(body, "plain"))
+
+    text = email.as_string()
+    server.sendmail(fromaddr, toaddr, text)
+
+    time.sleep(0.1)
+
+server.quit()
