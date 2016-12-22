@@ -31,9 +31,16 @@ students = csv.reader(open(filename))
 fromaddr = "foo@columbia.edu"
 fromname = "Your Name"
 
-server = smtplib.SMTP("smtp.gmail.com", 587)
-server.starttls()
-server.login(fromaddr, os.environ["LIONMAIL_DEVICE_PASS"])
+def setup_server():
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.starttls()
+    server.login(fromaddr, os.environ["LIONMAIL_DEVICE_PASS"])
+    return server
+
+server = None
+
+DEFAULT_BACKOFF = 30 # seconds
+next_backoff = DEFAULT_BACKOFF
 
 for uni, toname, seat in students:
     print uni, msg % seat
@@ -50,8 +57,21 @@ for uni, toname, seat in students:
     email.attach(MIMEText(body, "plain"))
 
     text = email.as_string()
-    server.sendmail(fromaddr, toaddr, text)
 
-    time.sleep(0.1)
+    while True:
+        try:
+            if server == None:
+                server = setup_server()
+            server.sendmail(fromaddr, toaddr, text)
+            time.sleep(1)
+            next_backoff = DEFAULT_BACKOFF
+            break
+        except smtplib.SMTPException as e:
+            print e
+            if server != None:
+                server.quit()
+            print "Waiting %s seconds" % next_backoff
+            time.sleep(next_backoff)
+            next_backoff *= 2
 
 server.quit()
