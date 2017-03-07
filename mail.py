@@ -48,8 +48,8 @@ for uni, toname, seat in students:
     toaddr = "%s@columbia.edu" % uni
 
     email = MIMEMultipart()
-    email["From"] = "%s <%s>" % (fromname, fromaddr)
-    email["To"] = "%s <%s>" % (toname, toaddr)
+    email["From"] = "\"%s\" <%s>" % (fromname, fromaddr)
+    email["To"] = "\"%s\" <%s>" % (toname, toaddr)
     email["Subject"] = subj
     email["Reply-To"] = ADDRESS
 
