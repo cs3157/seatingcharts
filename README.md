@@ -23,6 +23,7 @@ In general the script works by:
 How To Generate Charts
 ======================
 
+ * Log into [Old CourseWorks](https://courseworks.columbia.edu/). Then find your class site by navigating to a URL in the format of `https://courseworks.columbia.edu/portal/site/COMSW3157_001_2016_3/`
  * Go to Courseworks, Import Grades, Download Template as CSV -- this is our list of students
  * Go to Courseworks, Roster, Print as Single Column. Do a Chrome, "Save as Webpage Complete" to save it to Roster Pictures.html (this also saves students pictures to a subdirectory)
  * Edit seatingchart.py to configure:
