@@ -1,44 +1,96 @@
+#!/usr/bin/env python2
+
 """
 Seating Chart script. See https://github.com/cs3157/seatingcharts
 """
 
-# 1) a list of seats, in order of preference, with optionally ignored blank lines and repeats allowed
-#    basically tab/newline separated, with no difference between them
-SEATS_IN_ORDER_LIST = ["pupin301_ordered.txt"]
-
-# 2) a CSV list of students, one per line. assumed that the key is the first column, name second. 
-# ie what you get if you download a gradebook from courseworks
-STUDENT_LIST_LIST = ["roster_demo.csv"]
-
-# two lists, of students to assign first and last
-ASSIGN_FIRST = "assign_first.demo.txt"
-ASSIGN_LAST = "assign_last.demo.txt"
-
-# 3) a HTML page matching the courseworks print as single column roster feature, with student pictures
-ROSTER_PAGE = "Roster Pictures.demo.html"
-
-# 4) a tsv file containing the format of the room
-LAYOUT = "pupin301.txt"
-
-
-##outputs:
-NAME = "3157 Exam"
-
-# a CSV student id ordered list of assigned seats
-OUTPUT_CSV = "assigned_seats.demo.csv"
-
-# a pretty HTML version of uni <->seats
-OUTPUT_HTML = "assigned_seats.demo.html"
-
-# an html page with seat, student, and photo
-OUTPUT_CHART = "assigned_seats_chart.demo.html"
-
-
+import argparse
 import itertools
 import csv
+import os
 import random
+import sys
 from bs4 import BeautifulSoup
 
+
+def assert_file_exists(path):
+    if not os.path.isfile(path):
+        print("Missing required file: {}".format(path))
+        exit(1)
+
+
+def working_dir_path(name, slug, extension):
+    """
+    generates paths in the format:
+    out/3157-2017-9-final/roster_3157-2017-9-final.html
+    """
+    filename = "{}_{}.{}".format(name, slug, extension)
+    return os.path.join("out", slug, filename)
+
+
+parser = argparse.ArgumentParser(
+        description="Generate a seating chart based on the course roster")
+
+parser.add_argument("slug",
+        type=str,
+        help="the \"out\" subdirectory to use as the working directory",
+        metavar='<working-directory>')
+
+parser.add_argument("layout",
+        type=str,
+        help="the seating chart layout (classroom name) to use",
+        metavar="<layout>")
+
+parser.add_argument("-t", "--title",
+        default="Exam Seating Chart", type=str,
+        help="human-readable name that will be written the top of seating chart",
+        metavar="<title>")
+
+args = parser.parse_args()
+
+
+# 1) a list of seats, in order of preference, with optionally ignored blank lines and repeats allowed
+#    basically tab/newline separated, with no difference between them
+layout_ordered_path = os.path.join("layouts", args.layout + "_ordered.txt")
+SEATS_IN_ORDER_LIST = [ layout_ordered_path ]
+
+# 2) a CSV list of students, one per line. assumed that the key is the first column, name second.
+# ie what you get if you download a gradebook from courseworks
+roster_text_path = working_dir_path("roster", args.slug, "csv")
+assert_file_exists(roster_text_path)
+STUDENT_LIST_LIST = [ roster_text_path ]
+
+# two lists, of students to assign first and last
+assign_first_path = working_dir_path("assign_first", args.slug, "txt")
+assign_last_path  = working_dir_path("assign_last",  args.slug, "txt")
+
+ASSIGN_FIRST = assign_first_path if os.path.isfile(assign_first_path) else "/dev/null"
+ASSIGN_LAST  = assign_last_path  if os.path.isfile(assign_last_path)  else "/dev/null"
+
+# 3) a HTML page matching the courseworks print as single column roster feature, with student pictures
+roster_path = working_dir_path("roster", args.slug, "html")
+assert_file_exists(roster_path)
+ROSTER_PAGE = roster_path
+
+# 4) a tsv file containing the format of the room
+layout_path = os.path.join("layouts", args.layout + ".txt")
+assert_file_exists(layout_path)
+LAYOUT = layout_path
+
+##outputs:
+NAME = args.title
+
+# a CSV student id ordered list of assigned seats
+OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
+
+# a pretty HTML version of uni <->seats
+OUTPUT_HTML = working_dir_path("list", args.slug, "html")
+
+# an html page with seat, student, and photo
+OUTPUT_CHART = working_dir_path("map", args.slug, "html")
+
+
+# Now we're ready to assign seats
 
 assignments = {}
 lustudents = {}

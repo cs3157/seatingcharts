@@ -14,10 +14,10 @@ name is ignored. Email is sent to uni@columbia.edu.
 """
 
 #ADDRESS used as the reply-to address
-ADDRESS = "cucs3157-tas@googlegroups.com"
+ADDRESS = "cucs4118-tas@googlegroups.com"
 
 #the message template, takes one variable which is replaced with the seat number
-subj = "AP exam"
+subj = "OS Exam 1"
 msg = "You are assigned seat %s."
 
 if len(sys.argv) < 2:
@@ -28,8 +28,8 @@ filename = sys.argv[1]
 
 students = csv.reader(open(filename))
 
-fromaddr = "foo@columbia.edu"
-fromname = "Your Name"
+fromaddr = "kxc2103@columbia.edu"
+fromname = "Kevin Chen"
 
 def setup_server():
     server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -66,10 +66,8 @@ for uni, toname, seat in students:
             time.sleep(1)
             next_backoff = DEFAULT_BACKOFF
             break
-        except smtplib.SMTPException as e:
+        except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
             print e
-            if server != None:
-                server.quit()
             print "Waiting %s seconds" % next_backoff
             time.sleep(next_backoff)
             next_backoff *= 2

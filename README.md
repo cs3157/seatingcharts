@@ -2,9 +2,9 @@ seatingcharts
 =============
 
 Randomized Seating Chart Generator
-See https://github.com/cs3157/seatingcharts 
+See https://github.com/cs3157/seatingcharts
 
-Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming. 
+Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming.
 
 This python script takes a class roster, classroom layout, and some helper files to produce a random set of seating assignments. The best documentation may be comments in the script itself. The only non-standard requirement is beautifulsoup4.
 
@@ -16,27 +16,89 @@ In general the script works by:
  3. Reading in (a) list(s) of students.
  4. Shuffling the list of students.
  5. Assigning students to seats in the order listed in the the ordered list of seats
- 6. Outputting a CSV of assigned seats, an HTML of the seats, and a nice HTML visualization of the seating chart. 
+ 6. Outputting a CSV of assigned seats, an HTML of the seats, and a nice HTML visualization of the seating chart.
  7. (Optionally) email students their assignment directly
 
 
-How To Generate Charts
-======================
+Usage
+=====
 
- * Log into [Old CourseWorks](https://courseworks.columbia.edu/). Then find your class site by navigating to a URL in the format of `https://courseworks.columbia.edu/portal/site/COMSW3157_001_2016_3/`
- * Go to Courseworks, Import Grades, Download Template as CSV -- this is our list of students
- * Go to Courseworks, Roster, Print as Single Column. Do a Chrome, "Save as Webpage Complete" to save it to Roster Pictures.html (this also saves students pictures to a subdirectory)
- * Edit seatingchart.py to configure:
-   * SEATS_IN_ORDER_LIST to be a list of all the ORDERED seats (ie pupin301_ordered.txt). This file is actually pretty forgiving -- it can have repeats, doesn’t care about newlines or tabs or spaces, etc. Other punctuation will probably cause problems.
-   * STUDENT_LIST_LIST to be a list of all the csv files you want to do (in case it’s mixed exam seating). 
-   * Set ASSIGN_FIRST and ASSIGN_LAST, if you want it, so you can control seating assignments for certain people. I've typically used it to ASSIGN_FIRST those we want to give a very specific seat to, like those who need special accomodations or we want to keep an eye on. ASSIGN_LAST I often use for students who are unlikely to arrive (eg if they're likely to do a makeup or ODS accomodation), but we want to assign a seat in case they do come, this just helps make sure the good seats aren't then left open. 
- * Set LAYOUT to be the layout of the classroom, ie (pupin301.txt). *this is best edited in Excel or similar, where the whitespace/grid is easiest to see*
- * Run seatingchart.py (no arguments, just configure the stuff at the top of seatingchart)
+Downloading the input files
+---------------------------
 
-It will output:
- * assigned_seats.csv (will be fed to mail.py)
- * assigned_seats.html -- uni ordered list of suitable for printing and posting at the exam (firefox prints best)
- * assigned_seats_chart.html -- this is the seating assignments in a table, where each student is placed in their assigned seat according to the layout + assignments. this should be printed in firefox with “Ignore scaling and shrink to page width”
+For sample inputs, see the `out/demo/` directory.
+
+*   In the `out` directory, create a working directory for storing files related
+    to this exam.
+    -   Example: `3157-2017-9-001_final`
+    -   This string is the _slug_ for this exam.
+
+*   Log into [Old CourseWorks](https://courseworks.columbia.edu/) using Chrome
+    or Firefox.
+
+*   Find your class site by navigating to a URL in the format of
+    `https://courseworks.columbia.edu/portal/site/COMSW3157_001_2016_3/`
+
+*   Text roster
+    -   Go to Gradebook > Import Grades > Download Template as CSV.
+    -   Move this file to the working directory.
+    -   Rename it `roster_your-slug.csv`.
+
+*   Photo roster
+    -   Go to Roster > Print as Single Column. Cancel the print dialog.
+    -   Use File > Save Page As. In the Format drop-down, select "Web Page,
+        complete".
+    -   Navigate to your working directory.
+    -   Name the file `roster_your-slug.html` and press Save. (This will also
+        create a directory to store the photos.)
+
+*   If you want to put some students in the front/back of the classroom, also
+    create files named `assign-first_slug.txt` and `assign-last_slug.txt`.
+    -   Files should contain newline-separated lists of UNIs.
+    -   `assign_first` can be used for students who need special accomodations,
+        or those we want to keep an eye on.
+    -   `assign_last` can be used for students who are unlikely to arrive, such
+        as students with Office of Disability Services accomodations or some
+        other reason to be absent.
+
+
+Running the `seatingchart.py` script
+------------------------------------
+
+The usage of the command is as follows:
+
+    usage: seatingchart.py [-h] [-t <title>] <working-directory> <layout>
+
+    Generate a seating chart based on the course roster
+
+    positional arguments:
+      <working-directory>   the "out" subdirectory to use as the working directory
+      <layout>              the seating chart layout (classroom name) to use
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -t <title>, --title <title>
+                            human-readable name that will be written the top of
+                            seating chart
+
+Here are some examples:
+
+    ./seatingchart.py demo pupin301
+    ./seatingchart.py 3157-2017-9-002_m1 noco501 --title "3157-2017-9-002 Midterm 1"
+
+Once the script runs, it will output:
+
+*   `list_slug.csv`: A list of students and seats that can be fed into
+    `mail.py`.
+
+*   `list_slug.html`: A nicely formatted list of students and seats that you can
+    print and bring to the exam.
+
+*   `map_slug.html`: A map generated from the layout and assignments. Each box
+    contains the student's name, seat number, and photo.
+    -   Since the page can be very wide, this is best viewed in a browser.
+    -   Use this to verify that students are sitting in their assigned seats.
+
 
 How To Email Students
 =====================
@@ -46,3 +108,23 @@ You can now use mail.py to send individual emails to students with their seat as
 * `export LIONMAIL_DEVICE_PASS="abcdefg"`
 * In Google account settings, [allow less secure apps](https://cuit.columbia.edu/lionmail-allow-less-secure-apps). "Less secure" is their terminology for IMAP/SMTP clients.
 * Change the name and email in the script.
+
+
+Adding support for new classrooms
+=================================
+
+To create a new classroom layout, you need to make two files:
+
+1.  `classroomname.txt`, which specifies the layout of the room.
+    -   This is best edited in Excel, where the grid is easier to see.
+
+2.  `classroomname_ordered.txt`, which specifies the order in which the script
+    should fill seats.
+    -   You can create this file by copying and rearranging the layout file.
+    -   This file is pretty forgiving: it can have repeats and accepts any type
+        of whitespace (newline, tabs, and spaces).
+    -   Don't include leftie desks. It's easier to leave all of them open for
+        left-handed students to move into, rather than figuring out who all
+        the lefties are.
+    -   For a strategy to determine the order, see commit
+        [01d796c](https://github.com/cs3157/seatingcharts/commit/01d796ca3ed805d97b72be7f9024b3cd6564430f)
