@@ -61,8 +61,8 @@ assert_file_exists(roster_text_path)
 STUDENT_LIST_LIST = [ roster_text_path ]
 
 # two lists, of students to assign first and last
-assign_first_path = working_dir_path("assign_first", args.slug, "txt")
-assign_last_path  = working_dir_path("assign_last",  args.slug, "txt")
+assign_first_path = working_dir_path("assign-first", args.slug, "txt")
+assign_last_path  = working_dir_path("assign-last",  args.slug, "txt")
 
 ASSIGN_FIRST = assign_first_path if os.path.isfile(assign_first_path) else "/dev/null"
 ASSIGN_LAST  = assign_last_path  if os.path.isfile(assign_last_path)  else "/dev/null"
@@ -168,7 +168,7 @@ for seat, uni in assignments.iteritems():
 
 
 #Load picture files
-soup = BeautifulSoup(open(ROSTER_PAGE))
+soup = BeautifulSoup(open(ROSTER_PAGE), "html.parser")
 photos = {}
 for img in soup.findAll(class_="rosterImage"):
     url = img["src"]
