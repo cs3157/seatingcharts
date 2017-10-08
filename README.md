@@ -8,23 +8,11 @@ Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programmi
 
 This python script takes a class roster, classroom layout, and some helper files to produce a random set of seating assignments. The best documentation may be comments in the script itself. The only non-standard requirement is beautifulsoup4.
 
-Note, there two types of files: files about seats are tab/whitespace separated. Files with student info are CSVs. This is because I'm dumb.
-
-In general the script works by:
- 1. Reading in a layout for a classroom
- 2. reading in (an) ordered list(s) of seats from a classroom.
- 3. Reading in (a) list(s) of students.
- 4. Shuffling the list of students.
- 5. Assigning students to seats in the order listed in the the ordered list of seats
- 6. Outputting a CSV of assigned seats, an HTML of the seats, and a nice HTML visualization of the seating chart.
- 7. (Optionally) email students their assignment directly
-
 
 Usage
-=====
+-----
 
-Downloading the input files
----------------------------
+### Downloading the input files
 
 For sample inputs, see the `out/demo/` directory.
 
@@ -62,8 +50,7 @@ For sample inputs, see the `out/demo/` directory.
         other reason to be absent.
 
 
-Running the `seatingchart.py` script
-------------------------------------
+### Running the `seatingchart.py` script
 
 The usage of the command is as follows:
 
@@ -100,8 +87,9 @@ Once the script runs, it will output:
     -   Use this to verify that students are sitting in their assigned seats.
 
 
-How To Email Students
-=====================
+Emailing students their seating assignments
+-------------------------------------------
+
 You can now use mail.py to send individual emails to students with their seat assignment.
 
 * If you haven't already, [generate a new device password](https://uniapp.cc.columbia.edu/acctmanage/devicepass). Note that this will invalidate your existing sessions, so you will need to sign in again.
@@ -111,7 +99,16 @@ You can now use mail.py to send individual emails to students with their seat as
 
 
 Adding support for new classrooms
-=================================
+---------------------------------
+
+In general, the script works by:
+
+*   Reading in a layout for a classroom
+*   Reading in (an) ordered list(s) of seats from a classroom
+*   Reading in (a) list(s) of students
+*   Shuffling the list of students
+*   Assigning students to seats in the order listed in the the ordered list of seats
+*   Outputting a CSV of assigned seats, an HTML of the seats, and a nice HTML visualization of the seating chart
 
 To create a new classroom layout, you need to make two files:
 
