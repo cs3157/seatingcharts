@@ -42,7 +42,7 @@ parser.add_argument("layout",
         metavar="<layout>")
 
 parser.add_argument("-t", "--title",
-        default="Exam Seating Chart", type=str,
+        default=None, type=str,
         help="human-readable name that will be written the top of seating chart",
         metavar="<title>")
 
@@ -78,7 +78,7 @@ assert_file_exists(layout_path)
 LAYOUT = layout_path
 
 ##outputs:
-NAME = args.title
+NAME = args.title if args.title != None else "{} Seating".format(args.slug)
 
 # a CSV student id ordered list of assigned seats
 OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
