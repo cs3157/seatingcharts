@@ -71,5 +71,6 @@ for uni, toname, seat in students:
             print "Waiting %s seconds" % next_backoff
             time.sleep(next_backoff)
             next_backoff *= 2
+            server = None
 
 server.quit()
