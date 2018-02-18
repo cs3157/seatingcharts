@@ -68,14 +68,17 @@ ASSIGN_FIRST = assign_first_path if os.path.isfile(assign_first_path) else "/dev
 ASSIGN_LAST  = assign_last_path  if os.path.isfile(assign_last_path)  else "/dev/null"
 
 # 3) a HTML page matching the courseworks print as single column roster feature, with student pictures
-roster_path = working_dir_path("roster", args.slug, "html")
-assert_file_exists(roster_path)
-ROSTER_PAGE = roster_path
+# roster_path = working_dir_path("roster", args.slug, "html")
+# assert_file_exists(roster_path)
+# ROSTER_PAGE = roster_path
 
 # 4) a tsv file containing the format of the room
 layout_path = os.path.join("layouts", args.layout + ".txt")
 assert_file_exists(layout_path)
 LAYOUT = layout_path
+
+# 5) A directory containing students photos in the format uni.jpg
+PHOTO_DIR = "./photoroster.roster_files/"
 
 ##outputs:
 NAME = args.title if args.title != None else "{} Seating".format(args.slug)
@@ -94,6 +97,7 @@ OUTPUT_CHART = working_dir_path("map", args.slug, "html")
 
 assignments = {}
 lustudents = {}
+photos = {}
 for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
     seats = file(SEATS_IN_ORDER).readlines()
     seats = list(itertools.chain.from_iterable([z.strip().split() for z in seats]))
@@ -102,7 +106,13 @@ for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_
     assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
 
 
-    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][1:]
+    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST, "rU"))][1:]
+
+    # Assign students photos 
+    for student in students:
+        uni = student[0]
+        photos[uni] = PHOTO_DIR + uni + ".jpg"
+
     random.shuffle(students)
     for s in students:
         lustudents[s[0]] = s
@@ -166,19 +176,8 @@ output = csv.writer(open(OUTPUT_CSV, "w"))
 for seat, uni in assignments.iteritems():
     output.writerow(list(uni)[:2] + [seat])
 
-
-#Load picture files
-soup = BeautifulSoup(open(ROSTER_PAGE), "html.parser")
-photos = {}
-for img in soup.findAll(class_="rosterImage"):
-    url = img["src"]
-    uni = img.findParent().findNextSibling().findNextSibling().string
-    photos[uni] = url
-
-
-
 #Write the chart
-room = [s for s in csv.reader(open(LAYOUT), delimiter="\t")]
+room = [s for s in csv.reader(open(LAYOUT, "rU"), delimiter="\t")]
 maxrow = max([len(x) for x in room])
 
 with open(OUTPUT_CHART, "w") as html:

@@ -33,12 +33,10 @@ For sample inputs, see the `out/demo/` directory.
     -   Rename it `roster_your-slug.csv`.
 
 *   Photo roster
-    -   Go to Roster > Print as Single Column. Cancel the print dialog.
+    -   Go to Photo Roster in Canvas
     -   Use File > Save Page As. In the Format drop-down, select "Web Page,
         complete".
-    -   Navigate to your working directory.
-    -   Name the file `roster_your-slug.html` and press Save. (This will also
-        create a directory to store the photos.)
+    -   Ensure there is a directory named `photoroster.roster_files/` containing the student's images in the format `<uni>.jpg`
 
 *   If you want to put some students in the front/back of the classroom, also
     create files named `assign-first_slug.txt` and `assign-last_slug.txt`.
