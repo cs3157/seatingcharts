@@ -1,0 +1,84 @@
+# Document conventions:
+#     - Relative directions (left, right, up, down) are given from the
+#       perspective of the podium, e.g. A102 is left of A103, and B103 is above
+#       A103.
+#
+#     - Left-handed desks are in rows A-L, and are in the rightmost seats of
+#       the middle column (i.e. A104, B105, C106, etc.)
+###############################################################################
+# n.b. Davis's seats have wide backs and its floor has a shallow incline. This
+# means we don't have to worry about students in one row being able to see
+# papers in the row in front of them.
+
+A101 A102 A103
+B101 B103 B3 B4
+C101 C103 C2 C6 C1 C5
+D101 D103 D105 D2 D6 D1 D5
+E101 E103 E105 E1 E2
+F101 F103 F105 F107 F1 F2
+G101 G103 G105 G107 G1 G2
+# -- end section: 37 seats
+
+
+# These seats are pretty isolated and therefore low-risk despite being all the
+# way in the back.
+
+M1 M2
+N1 N2
+# -- end section: 4 seats (41 cumulative)
+
+
+# Seat right-handed students to the right of left-handed desks.
+# (we do this all the time and it's hard to cheat like this anyway)
+
+C105
+E107
+G109
+# -- end section: 3 seats (44 cumulative)
+
+
+# Start seating students in rows further in the back.
+# Maintains seat spacing but reduces visibility for proctors.
+
+H101 H103 H105 H107 H109 H1 H2
+I101 I103 I105 I107 I109 I2 I6 I1 I5
+J101 J103 J105 J107 J109 J2 J6 J1 J5 
+K101 K103 K105 K107 K109 K111 K2 K6 K1 K5
+L101 L103 L105 L107 L109 L111 L2 L6 L1 L5
+# -- end section: 45 seats (89 cumulative)
+
+
+# Seat more right-handed students to the right of left-handed desks.
+
+J111
+L113
+# -- end section: 2 seats (91 cumulative)
+
+
+# Fill up the last two rows all the way in the back.
+# Maintains seat spacing but reduces visibility for proctors.
+# None of the seats in rows N and P are left-handed.
+
+N101 N103 N105 N107 N109
+P101 P103 P105 P107 P109 P111
+# -- end section: 11 seats (102 cumulative)
+
+
+# Seat right-handed students next to other right-handed desks.
+# Beyond this point, seat spacing is compromised.
+
+B102 B104
+C102 C104 C3 C4
+D102 D104 D106 D3 D4
+E102 E104 E106 E3 E4
+F102 F104 F106 F108 F3 F4
+G102 G104 G106 G108 G3 G4
+H102 H104 H106 H108 H110 H3 H4
+I102 I104 I106 I108 I110 I3 I4
+J102 J104 J106 J108 J110 J3 J4
+K102 K104 K106 K108 K110 K112 K3 K4
+L102 L104 L106 L108 L110 L112 L3 L4
+N102 N104 N106 N108
+P102 P104 P106 P108 P110
+# -- end section: 74 seats (176 cumulative)
+# -- omitted: 12 seats (left-handed)
