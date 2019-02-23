@@ -21,24 +21,28 @@ For sample inputs, see the `out/demo/` directory.
     -   Example: `3157-2017-9-001_final`
     -   This string is the _slug_ for this exam.
 
-*   Log into [Old CourseWorks](https://courseworks.columbia.edu/) using Chrome
+*   Log into [CourseWorks](https://courseworks2.columbia.edu/) using Chrome
     or Firefox.
 
-*   Find your class site by navigating to a URL in the format of
-    `https://courseworks.columbia.edu/portal/site/COMSW3157_001_2016_3/`
+*   Find your class site.
 
 *   Text roster
-    -   Go to Gradebook > Import Grades > Download Template as CSV.
+    -   Go to Grades > Export > CSV File.
     -   Move this file to the working directory.
     -   Rename it `roster_your-slug.csv`.
 
 *   Photo roster
-    -   Go to Roster > Print as Single Column. Cancel the print dialog.
-    -   Use File > Save Page As. In the Format drop-down, select "Web Page,
+    -   Go to Photo Roster in the menu on the left and wait a minute.
+    -   On Chrome, use File > Save Page As. In the Format drop-down, select
+        "Web Page, complete".
+    -   On Firefox, right-click inside the Photo Roster panel and select
+        This Frame > Save Frame As. In the Format drop-down, select "Web Page,
         complete".
-    -   Navigate to your working directory.
-    -   Name the file `roster_your-slug.html` and press Save. (This will also
-        create a directory to store the photos.)
+    -   Navigate to your working directory, namme the file `your-slug.html`
+        and press Save.
+    -   You should now have an HTML page and a directory of files with all
+        students' photos, along with some miscellaneous JS files. You do not
+        need to delete the extra cruft.
 
 *   If you want to put some students in the front/back of the classroom, also
     create files named `assign-first_slug.txt` and `assign-last_slug.txt`.
