@@ -103,7 +103,7 @@ for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_
     assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
 
 
-    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][1:]
+    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST)) if s[2]][1:]
     random.shuffle(students)
     for s in students:
         lustudents[s[0]] = s
@@ -209,8 +209,8 @@ with open(OUTPUT_CHART, "w") as html:
             html.write("<td>\n")
             try:
                 student = assignments[seat]
-                uni = student[0]
-                name = student[1]
+                uni = student[2]
+                name = student[0]
                 try:
                     photo = photos[uni]
                     html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
