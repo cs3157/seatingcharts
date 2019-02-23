@@ -96,6 +96,7 @@ assignments = {}
 lustudents = {}
 for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
     seats = file(SEATS_IN_ORDER).readlines()
+    seats = [s for s in seats if s[0] != '#'] # Strip comments
     seats = list(itertools.chain.from_iterable([z.strip().split() for z in seats]))
 
     assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
