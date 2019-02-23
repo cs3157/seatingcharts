@@ -184,15 +184,18 @@ maxrow = max([len(x) for x in room])
 
 with open(OUTPUT_CHART, "w") as html:
     html.write("""<style>
+            table {
+                table-layout: fixed;
+                width: 100%;
+            }
             img {
                 width: 60px;
                 vertical-align: text-bottom;
-
             }
             .seat {
                 font-weight: bold;
                 font-size: 14pt;
-                                vetical-align: top;
+                vertical-align: top;
             }
             .name {
                 font-size: 9pt;
@@ -200,13 +203,18 @@ with open(OUTPUT_CHART, "w") as html:
             td {
                 text-align: center;
                 vertical-align: baseline;
+                width: 70px;
             }
             </style>
     <body><table border=1>\n\n""")
     for row in room:
         html.write("<tr>")
+        row_count = 0
+
         for seat in row:
+            row_count = row_count + 1
             html.write("<td>\n")
+
             try:
                 student = assignments[seat]
                 uni = student[2]
@@ -221,5 +229,9 @@ with open(OUTPUT_CHART, "w") as html:
             except KeyError:
                 html.write("""<span class="seat">%s</span>""" % (seat))
             html.write("</td>\n")
+
+        for i in range(maxrow - row_count):
+            html.write("<td></td>\n")
+
         html.write("</tr>\n\n")
     html.write("</table></body>")
