@@ -27,10 +27,26 @@
 # -- end section: 20 seats (86 cumulative)
 
 
+# Put students in the part of the balcony that's front and center.
+# This doesn't offer much visibility of people's desks from the side.
+#
+# Like the front row, proctors have unobstructed visibility of this part of
+# the room, so we're fine putting people shoulder to shoulder.
+173 174 172 175 171 176
+# -- end section: 6 seats (92 cumulative)
+
+
+# Fill out the rest of the front and center portion of the balcony.
+# Seats 166 and 181 are probably able to see the paper in front of them
+# and so have been omitted for now.
+170 177 169 178 168 179 167 180
+# -- end section: 8 seats (100 cumulative)
+
+
 # Seat people in the balcony from back to front.
 # Now I know what you're saying, "But Nelson, what's the point, there's
 # perfectly usable rows in front," but by seating people further away from
-# the main seating area, you obstruct visibility people's papers below.
+# the main seating area, you obstruct visibility of people's papers below.
 280 282 284 286 288
 290 292 294 296 298
 300 302 304 306 308
@@ -45,37 +61,22 @@
 208 210 212 214 216
 217 219 221 223 225
 227 229 231 233 235 237
-# -- end section: 66 seats (152 cumulative)
-
-
-# Okay, things are getting a bit dire now.
-# Put students in the part of the balcony that's front and center.
-# This doesn't offer much visibility of people's desks from the side.
-#
-# Like the front row, proctors have unobstructed visibility of this part of
-# the room, so we're fine putting people shoulder to shoulder.
-173 174 172 175 171 176
-# -- end section: 6 seats (158 cumulative)
-
-
-# Now we're in deep 💩.
-# Fill out the rest of the front and center portion of the balcony.
-# Seats 166 and 181 are probably able to see the paper in front of them.
-170 177 169 178 168 179 167 180 166 181
-# -- end section: 10 seats (168 cumulative)
+# -- end section: 66 seats (166 cumulative)
 
 
 # Fill the third front row of the classroom.
 34 36 38 42 44 46
-# -- end section: 6 seats (174 cumulative)
+# -- end section: 6 seats (172 cumulative)
 
 
+# Now we're in deep 💩.
 # Fill the balcony in alternating columns. The outer edges of the balcony
 # have horrendous sightlines of the papers below but what can you do at this
 # point?
 152 154 156 158 160 162 164
 182 184 186 188 190 192 194
-# -- end section: 14 seats (188 cumulative)
+166 181
+# -- end section: 16 seats (188 cumulative)
 
 
 # Fill out the rest of the room's right-handed desks.
