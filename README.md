@@ -1,12 +1,9 @@
 seatingcharts
 =============
 
-Randomized Seating Chart Generator
-See https://github.com/cs3157/seatingcharts
-
 Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming.
 
-This python script takes a class roster, classroom layout, and some helper files to produce a random set of seating assignments. The best documentation may be comments in the script itself. The only non-standard requirement is beautifulsoup4.
+This python script takes a class roster, classroom layout, and some helper files to produce a random set of seating assignments. The best documentation may be comments in the script itself.
 
 
 Usage
@@ -29,7 +26,7 @@ For sample inputs, see the `out/demo/` directory.
 *   Text roster
     -   Go to Grades > Export > CSV File.
     -   Move this file to the working directory.
-    -   Rename it `roster_your-slug.csv`.
+    -   Rename it `roster_<slug>.csv`.
 
 *   Photo roster
     -   Go to Photo Roster in the menu on the left and wait a minute.
@@ -38,14 +35,14 @@ For sample inputs, see the `out/demo/` directory.
     -   On Firefox, right-click inside the Photo Roster panel and select
         This Frame > Save Frame As. In the Format drop-down, select "Web Page,
         complete".
-    -   Navigate to your working directory, namme the file `your-slug.html`
+    -   Navigate to your working directory, name the file `<slug>.html`
         and press Save.
     -   You should now have an HTML page and a directory of files with all
         students' photos, along with some miscellaneous JS files. You do not
         need to delete the extra cruft.
 
 *   If you want to put some students in the front/back of the classroom, also
-    create files named `assign-first_slug.txt` and `assign-last_slug.txt`.
+    create files named `assign-first_<slug>.txt` and `assign-last_<slug>.txt`.
     -   Files should contain newline-separated lists of UNIs.
     -   `assign_first` can be used for students who need special accomodations,
         or those we want to keep an eye on.
@@ -71,6 +68,7 @@ The usage of the command is as follows:
       -t <title>, --title <title>
                             human-readable name that will be written the top of
                             seating chart
+      -d, --debug           print debug messages
 
 Here are some examples:
 
@@ -79,13 +77,13 @@ Here are some examples:
 
 Once the script runs, it will output:
 
-*   `list_slug.csv`: A list of students and seats that can be fed into
+*   `list_<slug>.csv`: A list of students and seats that can be fed into
     `mail.py`.
 
-*   `list_slug.html`: A nicely formatted list of students and seats that you can
+*   `list_<slug>.html`: A nicely formatted list of students and seats that you can
     print and bring to the exam.
 
-*   `map_slug.html`: A map generated from the layout and assignments. Each box
+*   `chart_<slug>.html`: A map generated from the layout and assignments. Each box
     contains the student's name, seat number, and photo.
     -   Since the page can be very wide, this is best viewed in a browser.
     -   Use this to verify that students are sitting in their assigned seats.

@@ -87,7 +87,7 @@ OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
 OUTPUT_HTML = working_dir_path("list", args.slug, "html")
 
 # an html page with seat, student, and photo
-OUTPUT_CHART = working_dir_path("map", args.slug, "html")
+OUTPUT_CHART = working_dir_path("chart", args.slug, "html")
 
 # Now we're ready to assign seats
 assignments = {}
