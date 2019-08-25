@@ -74,5 +74,5 @@ M102 M104 M106 M108 M110 M112 M3
 N103 N105 N107 N109
 P103 P105 P107 P109 P111
 # -- end section: 70 seats (165 cumulative)
-# -- omitted: 14 seats (left-handed) (179 cumulative)
-# -- omitted: 4 seats (wheelchair seats, no desks) (183 cumulative)
+# -- omitted: 13 seats (left-handed) (178 cumulative)
+# -- omitted: 4 seats (wheelchair seats, no desks) (182 cumulative)
