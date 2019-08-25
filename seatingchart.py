@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 """
 Seating Chart script. See https://github.com/cs3157/seatingcharts
@@ -92,8 +92,12 @@ OUTPUT_CHART = working_dir_path("map", args.slug, "html")
 # Now we're ready to assign seats
 assignments = {}
 
-for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
-    seats = file(SEATS_IN_ORDER).readlines()
+# The zip call is unnecessary right now because the two lists are singletons,
+# but I suppose it's worth keeping in case we want to generate more than one chart
+# at a time?
+for SEATS_IN_ORDER, STUDENT_LIST in zip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
+    with open(SEATS_IN_ORDER, "r") as f:
+        seats = f.readlines()
     seats = [s for s in seats if s[0] != '#']  # Strip comments
     seats = list(itertools.chain.from_iterable([z.strip().split() for z in seats]))
 
@@ -121,12 +125,12 @@ for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_
             try:
                 assignments[seat] = students.pop()
             except:
+                # Assigned all students
                 break
             if args.debug:
-                print "assigned", assignments[seat], "to", seat
+                print("assigned", assignments[seat], "to", seat)
     if students:
-        print "WARNING: unassigned students", students
-
+        print("WARNING: unassigned students", students)
 
 # Write out the HTML roster
 with open(OUTPUT_HTML, "w") as html:
@@ -150,7 +154,7 @@ with open(OUTPUT_HTML, "w") as html:
     <body>
     <h3>%s</h3>
     <div class="assignments">\n\n""" % NAME)
-    for seat, student in sorted(assignments.iteritems(), key=lambda x: x[1][2]):  # sort by uni
+    for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):  # sort by uni
         html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
                    % (student[2], seat))
     html.write("""</div></body>\n""")
@@ -159,7 +163,7 @@ with open(OUTPUT_HTML, "w") as html:
 
 # dump to CSV as well
 output = csv.writer(open(OUTPUT_CSV, "w"))
-for seat, uni in assignments.iteritems():
+for seat, uni in assignments.items():
     output.writerow(list(uni)[:2] + [seat])
 
 
@@ -167,8 +171,8 @@ for seat, uni in assignments.iteritems():
 room = [s for s in csv.reader(open(LAYOUT), delimiter="\t")]
 maxrow = max([len(x) for x in room])
 
-with open(OUTPUT_CHART, "w") as html:
-    html.write("""<style>
+with open(OUTPUT_CHART, "w") as seating_chart:
+    seating_chart.write("""<style>
             table {
                 table-layout: fixed;
                 width: 100%;
@@ -193,12 +197,12 @@ with open(OUTPUT_CHART, "w") as html:
             </style>
     <body><table border=1>\n\n""")
     for row in room:
-        html.write("<tr>")
+        seating_chart.write("<tr>")
         row_count = 0
 
         for seat in row:
             row_count = row_count + 1
-            html.write("<td>\n")
+            seating_chart.write("<td>\n")
 
             try:
                 student = assignments[seat]
@@ -207,18 +211,18 @@ with open(OUTPUT_CHART, "w") as html:
                 img_path = os.path.join(photos_path, uni + ".jpg")  # Used to check if file exists
                 img_rel_path = os.path.join(args.slug + "_files", uni + ".jpg")  # Inserted into HTML
                 if os.path.isfile(img_path):
-                    html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
+                    seating_chart.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
                            % (seat, uni, name, img_rel_path))
                 else:
-                    print "WARNING: no img found for %s" % (uni)
-                    html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> """
+                    print("WARNING: no img found for %s" % (uni))
+                    seating_chart.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> """
                            % (seat, uni, name))
             except KeyError:
-                html.write("""<span class="seat">%s</span>""" % (seat))
-            html.write("</td>\n")
+                seating_chart.write("""<span class="seat">%s</span>""" % (seat))
+            seating_chart.write("</td>\n")
 
         for i in range(maxrow - row_count):
-            html.write("<td></td>\n")
+            seating_chart.write("<td></td>\n")
 
-        html.write("</tr>\n\n")
-    html.write("</table></body>")
+        seating_chart.write("</tr>\n\n")
+    seating_chart.write("</table></body>")
