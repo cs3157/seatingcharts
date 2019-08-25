@@ -45,6 +45,10 @@ parser.add_argument("-t", "--title",
         help="human-readable name that will be written the top of seating chart",
         metavar="<title>")
 
+parser.add_argument("-d", "--debug",
+        action="store_true",
+        help="print debug messages")
+
 args = parser.parse_args()
 
 
@@ -66,69 +70,65 @@ assign_last_path  = working_dir_path("assign-last",  args.slug, "txt")
 ASSIGN_FIRST = assign_first_path if os.path.isfile(assign_first_path) else "/dev/null"
 ASSIGN_LAST  = assign_last_path  if os.path.isfile(assign_last_path)  else "/dev/null"
 
-photos_relpath = args.slug + "_files"
-photos_container = os.path.join("out", args.slug, photos_relpath)
+photos_path = os.path.join("out", args.slug, args.slug + "_files")
 
 # 3) a tsv file containing the format of the room
 layout_path = os.path.join("layouts", args.layout + ".txt")
 assert_file_exists(layout_path)
 LAYOUT = layout_path
 
-##outputs:
+# outputs:
 NAME = args.title if args.title != None else "{} Seating".format(args.slug)
 
 # a CSV student id ordered list of assigned seats
 OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
 
-# a pretty HTML version of uni <->seats
+# a pretty HTML version of uni <-> seats
 OUTPUT_HTML = working_dir_path("list", args.slug, "html")
 
 # an html page with seat, student, and photo
 OUTPUT_CHART = working_dir_path("map", args.slug, "html")
 
-
 # Now we're ready to assign seats
-
 assignments = {}
-lustudents = {}
+
 for SEATS_IN_ORDER, STUDENT_LIST in itertools.izip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
     seats = file(SEATS_IN_ORDER).readlines()
-    seats = [s for s in seats if s[0] != '#'] # Strip comments
+    seats = [s for s in seats if s[0] != '#']  # Strip comments
     seats = list(itertools.chain.from_iterable([z.strip().split() for z in seats]))
 
     assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
     assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
 
-
-    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST)) if s[2]][1:]
+    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][2:]  # Skip two header rows
     random.shuffle(students)
-    for s in students:
-        lustudents[s[0]] = s
 
-    #the assign_first/last students are shuffled randomly, so we need to pull them to the front/back
+    # the assign_first/last students are shuffled randomly, so we need to pull them to the front/back
     reassign = [x for x in students if x[0] in assign_last]
     for x in reassign:
         students.remove(x)
     students.extend(reassign)
-    students.reverse() #i know, i know
+    students.reverse()
 
     reassign = [x for x in students if x[0] in assign_first]
     for x in reassign:
         students.remove(x)
     students.extend(reassign)
 
-    #now loop over ordered seats until we run out of students
+    # now loop over ordered seats assigning students
     for seat in seats:
         if seat and seat not in assignments:
             try:
                 assignments[seat] = students.pop()
             except:
                 break
-            print "assigned", assignments[seat], "to", seat
-    print "Leaving unassigned:", students
+            if args.debug:
+                print "assigned", assignments[seat], "to", seat
+    if students:
+        print "WARNING: unassigned students", students
 
 
-#Write out the HTML roster
+# Write out the HTML roster
 with open(OUTPUT_HTML, "w") as html:
     html.write("""<style>
             .seat {
@@ -150,22 +150,20 @@ with open(OUTPUT_HTML, "w") as html:
     <body>
     <h3>%s</h3>
     <div class="assignments">\n\n""" % NAME)
-    for seat, student in sorted(assignments.iteritems(), key=lambda x: x[1]):
+    for seat, student in sorted(assignments.iteritems(), key=lambda x: x[1][2]):  # sort by uni
         html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
-                   % (student[0], seat))
+                   % (student[2], seat))
     html.write("""</div></body>\n""")
 
 
-print len(assignments)
-print len(set(seats))
 
-#dump to CSV as well
+# dump to CSV as well
 output = csv.writer(open(OUTPUT_CSV, "w"))
 for seat, uni in assignments.iteritems():
     output.writerow(list(uni)[:2] + [seat])
 
 
-#Write the chart
+# Write the chart
 room = [s for s in csv.reader(open(LAYOUT), delimiter="\t")]
 maxrow = max([len(x) for x in room])
 
@@ -206,12 +204,13 @@ with open(OUTPUT_CHART, "w") as html:
                 student = assignments[seat]
                 uni = student[2]
                 name = student[0]
-                photo_path = os.path.join(photos_container, uni + ".jpg")
-                photo_rel_path = os.path.join(photos_relpath, uni + ".jpg")
-                if os.path.isfile(photo_path):
+                img_path = os.path.join(photos_path, uni + ".jpg")  # Used to check if file exists
+                img_rel_path = os.path.join(args.slug + "_files", uni + ".jpg")  # Inserted into HTML
+                if os.path.isfile(img_path):
                     html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
-                           % (seat, uni, name, photo_rel_path))
+                           % (seat, uni, name, img_rel_path))
                 else:
+                    print "WARNING: no img found for %s" % (uni)
                     html.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> """
                            % (seat, uni, name))
             except KeyError:
