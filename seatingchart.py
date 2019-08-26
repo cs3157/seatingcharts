@@ -26,14 +26,13 @@ def working_dir_path(name, slug, extension):
     filename = "{}_{}.{}".format(name, slug, extension)
     return os.path.join("out", slug, filename)
 
-
 parser = argparse.ArgumentParser(
         description="Generate a seating chart based on the course roster")
 
 parser.add_argument("slug",
         type=str,
         help="the \"out\" subdirectory to use as the working directory",
-        metavar='<working-directory>')
+        metavar='<slug>')
 
 parser.add_argument("layout",
         type=str,
@@ -45,6 +44,10 @@ parser.add_argument("-t", "--title",
         help="human-readable name that will be written the top of seating chart",
         metavar="<title>")
 
+parser.add_argument("-l", "--lefty",
+        action="store_true",
+        help="assign seats to lefty students")
+
 parser.add_argument("-d", "--debug",
         action="store_true",
         help="print debug messages")
@@ -54,14 +57,25 @@ args = parser.parse_args()
 
 # 1) a list of seats, in order of preference, with optionally ignored blank lines and repeats allowed
 #    basically tab/newline separated, with no difference between them
-layout_ordered_path = os.path.join("layouts", args.layout + "_ordered.txt")
-SEATS_IN_ORDER_LIST = [ layout_ordered_path ]
+SEATS_IN_ORDER = os.path.join("layouts", args.layout + "_ordered.txt")
+assert_file_exists(SEATS_IN_ORDER)
 
-# 2) a CSV list of students, one per line. assumed that the key is the first column, name second.
+# 1.5) a list of lefty seats, in order of preference, with optioonally ignored blank lines and
+#      repeats allowed, basically tab/newline separted with no difference between them
+if args.lefty:
+    LSEATS_IN_ORDER = os.path.join("layouts", args.layout + "_lefty_ordered.txt")
+    assert_file_exists(LSEATS_IN_ORDER)
+
+# 2) a CSV list of students, one per line.
 # ie what you get if you download a gradebook from courseworks
-roster_text_path = working_dir_path("roster", args.slug, "csv")
-assert_file_exists(roster_text_path)
-STUDENT_LIST_LIST = [ roster_text_path ]
+STUDENT_LIST = working_dir_path("roster", args.slug, "csv")
+assert_file_exists(STUDENT_LIST)
+
+# 2.5) a CSV list of students, one per line.
+# ie what you get if you download a gradebook from courseworks
+if args.lefty:
+    LSTUDENT_LIST = working_dir_path("lefty_roster", args.slug, "csv")
+    assert_file_exists(LSTUDENT_LIST)
 
 # two lists, of students to assign first and last
 assign_first_path = working_dir_path("assign-first", args.slug, "txt")
@@ -78,7 +92,7 @@ assert_file_exists(layout_path)
 LAYOUT = layout_path
 
 # outputs:
-NAME = args.title if args.title != None else "{} Seating".format(args.slug)
+TITLE = args.title if args.title != None else "{} Seating".format(args.slug)
 
 # a CSV student id ordered list of assigned seats
 OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
@@ -92,45 +106,62 @@ OUTPUT_CHART = working_dir_path("chart", args.slug, "html")
 # Now we're ready to assign seats
 assignments = {}
 
-# The zip call is unnecessary right now because the two lists are singletons,
-# but I suppose it's worth keeping in case we want to generate more than one chart
-# at a time?
-for SEATS_IN_ORDER, STUDENT_LIST in zip(SEATS_IN_ORDER_LIST, STUDENT_LIST_LIST):
-    with open(SEATS_IN_ORDER, "r") as f:
-        seats = f.readlines()
-    seats = [s for s in seats if s[0] != '#']  # Strip comments
-    seats = list(itertools.chain.from_iterable([z.strip().split() for z in seats]))
+with open(SEATS_IN_ORDER, "r") as f:
+    seats = f.readlines()
+seats = [s for s in seats if s[0] != '#']  # Strip comments
+seats = list(itertools.chain.from_iterable([z.strip().split() for z in seats]))
 
-    assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
-    assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
+assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
+assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
 
-    students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][2:]  # Skip two header rows
-    random.shuffle(students)
+students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][2:]  # Skip two header rows
+random.shuffle(students)
 
-    # the assign_first/last students are shuffled randomly, so we need to pull them to the front/back
-    reassign = [x for x in students if x[0] in assign_last]
-    for x in reassign:
-        students.remove(x)
-    students.extend(reassign)
-    students.reverse()
+# the assign_first/last students are shuffled randomly, so we need to pull them to the front/back
+reassign = [x for x in students if x[0] in assign_last]
+for x in reassign:
+    students.remove(x)
+students.extend(reassign)
+students.reverse()
 
-    reassign = [x for x in students if x[0] in assign_first]
-    for x in reassign:
-        students.remove(x)
-    students.extend(reassign)
+reassign = [x for x in students if x[0] in assign_first]
+for x in reassign:
+    students.remove(x)
+students.extend(reassign)
 
-    # now loop over ordered seats assigning students
-    for seat in seats:
-        if seat and seat not in assignments:
+# now loop over ordered seats assigning students
+for seat in seats:
+    if seat and seat not in assignments:
+        try:
+            assignments[seat] = students.pop()
+        except:
+            # Assigned all students
+            break
+        if args.debug:
+            print("assigned", assignments[seat], "to", seat)
+if students:
+    print("WARNING: unassigned students", students)
+
+if args.lefty:
+    with open(LSEATS_IN_ORDER, "r") as f:
+        lseats = f.readlines()
+    lseats = [s for s in lseats if s[0] != "#"]
+    lseats = list(itertools.chain.from_iterable([z.strip().split() for z in lseats]))
+
+    lstudents = [tuple(s) for s in csv.reader(open(LSTUDENT_LIST))][2:]
+    random.shuffle(lstudents)
+
+    for lseat in lseats:
+        if lseat and lseat not in assignments:
             try:
-                assignments[seat] = students.pop()
+                assignments[lseat] = lstudents.pop()
             except:
-                # Assigned all students
+                # All lefties assigned
                 break
             if args.debug:
-                print("assigned", assignments[seat], "to", seat)
-    if students:
-        print("WARNING: unassigned students", students)
+                print("assigned lefty", assignments[lseat], "to", lseat)
+    if lstudents:
+        print("WARNING: unassigned lefties", lstudents)
 
 # Write out the HTML roster
 with open(OUTPUT_HTML, "w") as html:
@@ -153,12 +184,11 @@ with open(OUTPUT_HTML, "w") as html:
             </style>
     <body>
     <h3>%s</h3>
-    <div class="assignments">\n\n""" % NAME)
+    <div class="assignments">\n\n""" % TITLE)
     for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):  # sort by uni
         html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
                    % (student[2], seat))
     html.write("""</div></body>\n""")
-
 
 
 # dump to CSV as well
