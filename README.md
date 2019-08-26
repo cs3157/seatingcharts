@@ -23,10 +23,16 @@ For sample inputs, see the `out/demo/` directory.
 
 *   Find your class site.
 
-*   Text roster
+*   Student roster
     -   Go to Grades > Export > CSV File.
     -   Move this file to the working directory.
     -   Rename it `roster_<slug>.csv`.
+
+*   (Optional) Lefty roster
+    -   Ensure that your classroom has a `<classroom>_lefty_ordered.txt` file.
+    -   Move lefties from `roster_<slug>.csv` to a new file called
+        `left_roster_<slug>.csv`. This file follows the same format as the normal roster.
+    -   Run `seatingcharts.py` with the `-l` flag.
 
 *   Photo roster
     -   Go to Photo Roster in the menu on the left and wait a minute.
@@ -55,12 +61,12 @@ For sample inputs, see the `out/demo/` directory.
 
 The usage of the command is as follows:
 
-    usage: seatingchart.py [-h] [-t <title>] <working-directory> <layout>
+    usage: seatingchart.py [-h] [-t <title>] [-l] [-d] <slug> <layout>
 
     Generate a seating chart based on the course roster
 
     positional arguments:
-      <working-directory>   the "out" subdirectory to use as the working directory
+      <slug>                the "out" subdirectory to use as the working directory
       <layout>              the seating chart layout (classroom name) to use
 
     optional arguments:
@@ -68,6 +74,7 @@ The usage of the command is as follows:
       -t <title>, --title <title>
                             human-readable name that will be written the top of
                             seating chart
+      -l, --lefty           assign seats to lefty students
       -d, --debug           print debug messages
 
 Here are some examples:
@@ -77,9 +84,6 @@ Here are some examples:
 
 Once the script runs, it will output:
 
-*   `list_<slug>.csv`: A list of students and seats that can be fed into
-    `mail.py`.
-
 *   `list_<slug>.html`: A nicely formatted list of students and seats that you can
     print and bring to the exam.
 
@@ -87,6 +91,9 @@ Once the script runs, it will output:
     contains the student's name, seat number, and photo.
     -   Since the page can be very wide, this is best viewed in a browser.
     -   Use this to verify that students are sitting in their assigned seats.
+
+*   `list_<slug>.csv`: A list of students and seats that can be fed into
+    `mail.py`.
 
 
 Emailing students their seating assignments
@@ -112,18 +119,17 @@ In general, the script works by:
 *   Assigning students to seats in the order listed in the the ordered list of seats
 *   Outputting a CSV of assigned seats, an HTML of the seats, and a nice HTML visualization of the seating chart
 
-To create a new classroom layout, you need to make two files:
+To create a new classroom layout, you need to make three files:
 
-1.  `classroomname.txt`, which specifies the layout of the room.
+1.  `<classroom>.txt`, which specifies the layout of the room.
     -   This is best edited in Excel, where the grid is easier to see.
 
-2.  `classroomname_ordered.txt`, which specifies the order in which the script
+2.  `<classroom>_ordered.txt`, which specifies the order in which the script
     should fill seats.
     -   You can create this file by copying and rearranging the layout file.
     -   This file is pretty forgiving: it can have repeats and accepts any type
         of whitespace (newline, tabs, and spaces).
-    -   Don't include leftie desks. It's easier to leave all of them open for
-        left-handed students to move into, rather than figuring out who all
-        the lefties are.
     -   For a strategy to determine the order, see commit
         [01d796c](https://github.com/cs3157/seatingcharts/commit/01d796ca3ed805d97b72be7f9024b3cd6564430f)
+3.  `<classroom>_lefty_ordered.txt`, which specifies the order in which the script
+    shouild fill lefty seats.
