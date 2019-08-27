@@ -202,7 +202,8 @@ room = [s for s in csv.reader(open(LAYOUT), delimiter="\t")]
 maxrow = max([len(x) for x in room])
 
 with open(OUTPUT_CHART, "w") as seating_chart:
-    seating_chart.write("""<style>
+    seating_chart.write("""
+    <style>
             table {
                 table-layout: fixed;
                 width: 100%;
@@ -224,7 +225,23 @@ with open(OUTPUT_CHART, "w") as seating_chart:
                 vertical-align: baseline;
                 width: 70px;
             }
-            </style>
+            .unselected {
+                background-color: white;
+            }
+            .selected {
+                background-color: orange;
+            }
+    </style>
+
+    <script>
+        function selectStudent(cell) {
+            if (cell.className === "unselected") {
+                cell.className = "selected";
+            } else {
+                cell.className = "unselected";
+            }
+        }
+    </script>
     <body><table border=1>\n\n""")
     for row in room:
         seating_chart.write("<tr>")
@@ -232,7 +249,7 @@ with open(OUTPUT_CHART, "w") as seating_chart:
 
         for seat in row:
             row_count = row_count + 1
-            seating_chart.write("<td>\n")
+            seating_chart.write("<td class='unselected' onclick='selectStudent(this)' >\n")
 
             try:
                 student = assignments[seat]
