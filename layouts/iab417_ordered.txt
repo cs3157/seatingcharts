@@ -1,0 +1,78 @@
+# Document conventions:
+#     - Relative directions (left, right, up, down) are given from the
+#       perspective of the podium, e.g. A103 is left of A101, and B103 is above
+#       A103.
+#
+#     - Left-handed desks are D101 - P101, D120 – Q120
+###############################################################################
+# Given that the stage is raised up a bit, we can get away with filling up the
+# first couple of rows.
+A100 A102 A111 A109	A107 A105 A103 A101 A106 A104 A113 A115
+B121 B119 B117 B115	B113 B111 B109 B107	B105 B103 B101 B100	B102 B104 B106 B108	B110 B112 B114
+# -- end section: 31 seats
+
+# Let's start spreading people out, skipping every other seat.
+C121 C117 C113 C109 C105 C101 C100 C104	C108 C112 C116 C120
+# -- end section: 12 seats (43 cumulative)
+
+# D101 – P101 and D120 - Q120 are lefties. We'll have to skip those.
+# Also skip every other seat for spacing
+D121 D117 D113 D109 D105 D100 D104 D108	D112 D116
+E121 E117 E113 E109 E105 E100 E104 E108	E112 E116
+F121 F117 F113 F109 F105 F100 F104 F108	F112 F116
+G121 G117 G113 G109 G105 G100 G104 G108	G112 G116
+H121 H117 H113 H109 H105 H100 H104 H108 H112 H116
+I121 I117 I113 I109 I105 I100 I104 I108	I112 I116
+J121 J117 J113 J109 J105 J100 J104 J108	J112 J116
+K121 K117 K113 K109 K105 K100 K104 K108	K112 K116
+L121 L117 L113 L109 L105 L100 L104 L108	L112 L116
+M121 M117 M113 M109 M105 M100 M104 M108	M112 M116
+N121 N117 N113 N109 N105 N100 N104 N108	N112 N116
+O121 O117 O113 O109 O105 O100 O104 O108	O112 O116
+P121 P117 P113 P109 P105 P100 P104 P108	P112 P116
+# -- end section: 130 seats (173 cumulative)
+
+# No more lefties in left section, but one more in right section.
+Q121 Q117 Q113 Q109 Q105 Q101 Q100 Q104	Q108 Q112 Q116
+# -- end section: 11 seats (184 cumulative)
+
+# Oh god oh fuck. The left section of the room has a few more rows, but they're dummy far from
+# the stage. Not the best :/
+R121 R117 R113 R109 R105 R101
+S121 S117 S113 S109 S105 S101
+T121 T117 T113 T109 T105 T101
+# -- end section: 18 seats (202 cumulative)
+
+# sad meme :( We'll have to just fill in all seats we skipped now
+C119 C115 C111 C107 C103 C102 C106 C110 C114 C118
+# -- end section: 10 seats (212 cumulative)
+
+# more cringe: filling skipped seats
+D119 D115 D111 D107 D103 D102 D106 D110 D114 D118
+E119 E115 E111 E107 E103 E102 E106 E110 E114 E118
+F119 F115 F111 F107 F103 F102 F106 F110 F114 F118
+G119 G115 G111 G107 G103 G102 G106 G110 G114 G118
+H119 H115 H111 H107 H103 H102 H106 H110 H114 H118
+I119 I115 I111 I107 I103 I102 I106 I110 I114 I118
+J119 J115 J111 J107 J103 J102 J106 J110 J114 J118
+K119 K115 K111 K107 K103 K102 K106 K110 K114 K118
+L119 L115 L111 L107 L103 L102 L106 L110 L114 L118
+M119 M115 M111 M107 M103 M102 M106 M110 M114 M118
+N119 N115 N111 N107 N103 N102 N106 N110 N114 N118
+O119 O115 O111 O107 O103 O102 O106 O110 O114 O118
+P119 P115 P111 P107 P103 P102 P106 P110 P114 P118
+# -- end section: 130 seats (342 cumulative)
+
+# another row
+Q119 Q115 Q111 Q107 Q103 Q102 Q106 Q110 Q114 Q118
+# -- end section: 10 seats (352 cumulative)
+
+# uh oh! filling up the back corner now >_<
+R119 R115 R111 R107 R103
+S119 S115 S111 S107 S103
+T119 T115 T111 T107 T103
+# -- end section: 15 seats (367 cumulative)
+
+# -- omitted: 27 lefty seats
+# -- total seats in IAB 417: 394
+
