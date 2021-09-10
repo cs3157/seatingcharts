@@ -1,10 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
-import csv, sys, os
-import time
+import csv
+import os
 import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
+import sys
+import time
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 """
 expects a csv file with assignments of the form:
@@ -21,7 +23,7 @@ subj = "OS Exam 1"
 msg = "You are assigned seat %s."
 
 if len(sys.argv) < 2:
-    print "USAGE: %s <assignment_csv_filename>" % sys.argv[0]
+    print("USAGE: %s <assignment_csv_filename>" % sys.argv[0])
     sys.exit(1)
 
 filename = sys.argv[1]
@@ -43,7 +45,7 @@ DEFAULT_BACKOFF = 30 # seconds
 next_backoff = DEFAULT_BACKOFF
 
 for uni, toname, seat in students:
-    print uni, msg % seat
+    print(uni, msg % seat)
 
     toaddr = "%s@columbia.edu" % uni
 
@@ -67,8 +69,8 @@ for uni, toname, seat in students:
             next_backoff = DEFAULT_BACKOFF
             break
         except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
-            print e
-            print "Waiting %s seconds" % next_backoff
+            print(e)
+            print("Waiting %s seconds" % next_backoff)
             time.sleep(next_backoff)
             next_backoff *= 2
             server = None
