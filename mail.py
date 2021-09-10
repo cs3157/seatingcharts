@@ -69,7 +69,7 @@ for uni, toname, seat in students:
             next_backoff = DEFAULT_BACKOFF
             break
         except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
-            print(e)
+            print(f"{e.smtp_code}: {e.smtp_error.decode()}")
             print("Waiting %s seconds" % next_backoff)
             time.sleep(next_backoff)
             next_backoff *= 2
