@@ -1,0 +1,41 @@
+# 1st row, 08 is disability seating
+
+00 02 04 06
+
+# 2nd row, 19 is lefty
+09 11 13 15 17
+
+# 3rd row, 30 is lefty
+20 22 24 26 28
+
+# 4th row, 41 is lefty
+31 33 35 37 39
+
+# 5th row, 52 lefty
+42 44 46 48 50
+
+# 6th row 63 is lefty
+53 55 57 59 61
+
+# 7th row, 74 is lefty
+64 66 68 70 72
+
+# 8th row, 85 is lefty
+75 77 79 81 83
+
+# Go from 1st row to 8th row filling in skipped seats
+01 03 05 07
+
+10 12 14 16 18
+
+21 23 25 27 29
+
+32 34 36 38 40
+
+43 45 47 49 51
+
+54 56 58 60 62
+
+65 67 69 71 73
+
+76 78 80 82 84
