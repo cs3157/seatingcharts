@@ -5,8 +5,7 @@
 #
 #     - Left-handed desks are D101 - P101, D120 – Q120
 ###############################################################################
-# Given that the stage is raised up a bit, we can get away with filling up the
-# first couple of rows. (Because of COVID we are not doing that anymore)
+# Game on!
 A100 A111	A107 A103 A104 A115
 B121 B117	B113 B109	B105 B101 B100 B104 B108 B112
 # -- end section: 16 seats
