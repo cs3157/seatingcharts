@@ -28,15 +28,6 @@ N1 N4
 # -- end section: 4 seats (38 cumulative)
 
 
-# Seat right-handed students to the right of left-handed desks.
-# (we do this all the time and it's hard to cheat like this anyway)
-
-C105
-E107
-G109
-# -- end section: 3 seats (41 cumulative)
-
-
 # Start seating students in rows further in the back.
 # Maintains seat spacing but reduces visibility for proctors.
 
@@ -45,7 +36,7 @@ J101 J103 J105 J107 J109 J2 J6 J1 J5
 K101 K103 K105 K107 K109 K111 K6 K1 K5 
 L101 L103 L105 L107 L109 L111 L6 L1 L5
 M101 M103 M105 M107 M109 M111 M113 M1 M5
-# -- end section: 43 seats (84 cumulative)
+# -- end section: 43 seats (81 cumulative)
 
 
 # Fill up the last two rows all the way in the back.
@@ -54,7 +45,16 @@ M101 M103 M105 M107 M109 M111 M113 M1 M5
 
 N102 N104 N106 N108 N110
 P102 P104 P106 P108 P110
-# -- end section: 10 seats (94 cumulative)
+# -- end section: 10 seats (91 cumulative)
+
+
+# Seat right-handed students to the right of left-handed desks.
+# (we do this all the time and it's hard to cheat like this anyway)
+
+C105
+E107
+G109
+# -- end section: 3 seats (94 cumulative)
 
 
 # Seat right-handed students next to other right-handed desks.
