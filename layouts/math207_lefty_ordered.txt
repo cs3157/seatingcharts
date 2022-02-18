@@ -1,0 +1,17 @@
+20
+31
+43
+55
+67
+79
+92
+104
+139
+151
+# At this point spacing is compromised
+19
+32
+44
+56
+68
+80
