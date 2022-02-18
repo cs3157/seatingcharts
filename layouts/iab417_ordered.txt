@@ -5,15 +5,14 @@
 #
 #     - Left-handed desks are D101 - P101, D120 – Q120
 ###############################################################################
-# Given that the stage is raised up a bit, we can get away with filling up the
-# first couple of rows.
-A100 A102 A111 A109	A107 A105 A103 A101 A106 A104 A113 A115
-B121 B119 B117 B115	B113 B111 B109 B107	B105 B103 B101 B100	B102 B104 B106 B108	B110 B112 B114
-# -- end section: 31 seats
+# Game on!
+A100 A111	A107 A103 A104 A115
+B121 B117	B113 B109	B105 B101 B100 B104 B108 B112
+# -- end section: 16 seats
 
 # Let's start spreading people out, skipping every other seat.
 C121 C117 C113 C109 C105 C101 C100 C104	C108 C112 C116 C120
-# -- end section: 12 seats (43 cumulative)
+# -- end section: 12 seats (28 cumulative)
 
 # D101 – P101 and D120 - Q120 are lefties. We'll have to skip those.
 # Also skip every other seat for spacing
@@ -30,22 +29,24 @@ M121 M117 M113 M109 M105 M100 M104 M108	M112 M116
 N121 N117 N113 N109 N105 N100 N104 N108	N112 N116
 O121 O117 O113 O109 O105 O100 O104 O108	O112 O116
 P121 P117 P113 P109 P105 P100 P104 P108	P112 P116
-# -- end section: 130 seats (173 cumulative)
+# -- end section: 130 seats (158 cumulative)
 
 # No more lefties in left section, but one more in right section.
 Q121 Q117 Q113 Q109 Q105 Q101 Q100 Q104	Q108 Q112 Q116
-# -- end section: 11 seats (184 cumulative)
+# -- end section: 11 seats (169 cumulative)
 
 # Oh god oh fuck. The left section of the room has a few more rows, but they're dummy far from
 # the stage. Not the best :/
 R121 R117 R113 R109 R105 R101
 S121 S117 S113 S109 S105 S101
 T121 T117 T113 T109 T105 T101
-# -- end section: 18 seats (202 cumulative)
+# -- end section: 18 seats (187 cumulative)
 
 # sad meme :( We'll have to just fill in all seats we skipped now
+A102 A109 A105 A101 A106 A113 
+B119 B115	B111 B107	B103 B102	B106 B110 B114
 C119 C115 C111 C107 C103 C102 C106 C110 C114 C118
-# -- end section: 10 seats (212 cumulative)
+# -- end section: 25 seats (212 cumulative)
 
 # more cringe: filling skipped seats
 D119 D115 D111 D107 D103 D102 D106 D110 D114 D118
