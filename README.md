@@ -22,6 +22,8 @@ Thing's changed! We regularly get a huge class size (over 300 students.) So we X
 
 4. run the script: go_brr.py rooms roster.csv
 
+You can find the output in the out folder :)
+
 ### ### ### ### ### ### ### ### ### ### ### ### 
 ### Downloading the input files
 
