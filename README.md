@@ -16,8 +16,8 @@ Thing's changed! We regularly get a huge class size (over 300 students.) So XXXu
 2. Download all the images from the photo roster in coursworks by chrome extensions, and save them in the images folder
 
 3. modify the rooms file in this format: 
-	[layout-1] [number of students]
-	[layout-2] [number of students]
+	<p>[layout-1] [number of students]</p>
+	<p>[layout-2] [number of students]</p>
 	(see sample_room)
 
 4. run the script: go_brr.py rooms roster.csv
