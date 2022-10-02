@@ -11,14 +11,18 @@ Usage
 Update 10/2/2022:
 Thing's changed! We regularly get a huge class size (over 300 students.) So we XXXurxo wrote a helper script to handle multiple rooms in one shot; here is how to use it:
 
-Download the roster from the Grades tab of courseworks; save it as roster.csv, which contains three columns: Student ID, Student Name, and blank. (see sample_roster.csv)
-Download all the images from the photo roster in coursworks by chrome extensions, and save them in the images folder
-modify the rooms file in this format: 
+1. Download the roster from the Grades tab of courseworks; save it as roster.csv, which contains three columns: Student ID, Student Name, and blank. (see sample_roster.csv)
+
+2. Download all the images from the photo roster in coursworks by chrome extensions, and save them in the images folder
+
+3. modify the rooms file in this format: 
 	<layout> <number of students>
 	<layout> <number of students>
 	(see sample_room)
 
-Finally: run the script: go_brr.py rooms roster.csv
+4. run the script: go_brr.py rooms roster.csv
+
+### ### ### ### ### ### ### ### ### ### ### ### 
 ### Downloading the input files
 
 For sample inputs, see the `out/demo/` directory.
