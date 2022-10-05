@@ -49,7 +49,7 @@ rooms = list([z.strip().split() for z in rooms])
 print(f"rooms:{rooms}")
 for _, count in rooms:
     seat_count += int(count)
-print(f"Total seat count:{seat_count}")
+print(f"Total seats:{seat_count}")
 
 for room in rooms:
     rname = room[0]
