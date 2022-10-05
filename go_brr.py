@@ -9,7 +9,7 @@ import sys
 import math
 
 OUT_PATH = "out"
-HTML_PATH = "html/seating"
+HTML_PATH = "~/html/seating"
 
 parser = argparse.ArgumentParser(
     description="Go brrr with the seating charts")
@@ -48,10 +48,12 @@ for room in rooms:
     path = os.path.join(OUT_PATH, rname)
     os.system("rm -rf %s" % path)
     os.mkdir(path)
-    print(("cp %s %s" %
+    print(("ln -s %s %s" %
            ("images", path + "/" + "images")))
-    os.system(("cp -rf %s %s" %
-               ("images", path + "/" + "images")))
+    # print(("cp %s %s" %
+    #        ("images", path + "/" + "images")))
+    # os.system(("cp -rf %s %s" %
+    #            ("images", path + "/" + "images")))
     csvfile = open(os.path.join(path, "roster_" + rname + ".csv"), "w")
     output = csv.writer(csvfile)
     output.writerow("")
