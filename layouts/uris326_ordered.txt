@@ -1,0 +1,31 @@
+# 1st row  - even
+08 06 10 04 12 02 00
+
+# 2nd row  - even
+20 22 18 24 16 26 14 28
+
+# 3rd row
+36 38 34 40 32 42 30 44 46
+
+# 4th row
+53 55 51 57 49 59 47 61
+
+# 5th row
+64 65
+
+# we are running out of space
+#re-assign from middle
+# 1st row
+07 09 05 11 03 13 01
+
+# 2nd row
+21 23 19 25 17 27 17 29 15
+
+# 3rd row
+37 39 35 41 33 43 31 45
+
+# 4rd row
+53 55 51 57 49 59 47 61
+
+# 5th row - end of the world
+63 66

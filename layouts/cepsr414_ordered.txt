@@ -1,0 +1,31 @@
+# 1st row
+00 02 04 06
+
+# 2nd row
+07 09 11 13
+
+# 3rd row
+15 17 19 21
+
+# 4th row
+22 24 25 26 28
+
+# 5th row
+30 32 34 36
+
+# we are running out of space
+#re-assign from middle
+# 1st row
+03 01 05
+
+# 2nd row
+10 12 08 14
+
+# 3rd row
+18 20 16
+
+# 4rd row
+25 27 23 29
+
+# 5th row
+33 35 31 37
