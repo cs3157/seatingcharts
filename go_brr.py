@@ -27,7 +27,8 @@ args = parser.parse_args()
 ROOMS_IN_ORDER = args.rooms
 STUDENT_LIST = args.roster
 
-students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][3:]
+#students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][3:]
+students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))]
 random.shuffle(students)
 student_count = len(students)
 seat_count = 0
@@ -35,9 +36,11 @@ for img in glob.glob("images/*"):
     if img.split('.')[1] == "jpeg":
         os.rename(img, img.split('.')[0]+'.jpg')
 
-os.system("rm -r %s" %HTML_PATH)
+os.system(f"rm -r {HTML_PATH}")
 os.system("mkdir -p %s" %HTML_PATH)
-os.system("chmod 711 %s" %HTML_PATH)
+os.system("touch %s/seat.csv" %HTML_PATH)
+os.system("chmod 744 %s/seat.csv" %HTML_PATH)
+os.system("chmod 755 %s" %HTML_PATH)
 
 with open(ROOMS_IN_ORDER, 'r') as f:
     rooms = f.readlines()
@@ -46,6 +49,7 @@ rooms = list([z.strip().split() for z in rooms])
 print(f"rooms:{rooms}")
 for _, count in rooms:
     seat_count += int(count)
+print(f"Total seat count:{seat_count}")
 
 for room in rooms:
     rname = room[0]
@@ -63,6 +67,7 @@ for room in rooms:
     output.writerow("")
     output.writerow("")
     for i in range(math.ceil(student_count / seat_count * int(room[1]))):
+#    for i in range(int(room[1])):
         if(len(students) > 0):
             student = random.choice(students)
             output.writerow(student)
@@ -72,8 +77,12 @@ for room in rooms:
               (rname, rname))
     os.system("cp %s/%s/chart_%s.html %s/%s.html" %
               (OUT_PATH, rname, rname, HTML_PATH, rname))
+    os.system(f"perl -F, -lane 's/$F[2]/$F[2], {rname}/; print' {OUT_PATH}/{rname}/list_{rname}.csv >> {HTML_PATH}/seat.csv")
+    os.system("cp %s/%s/list_%s.csv %s/%s.csv" %
+              (OUT_PATH, rname, rname, HTML_PATH, rname))
     os.system("chmod 644 %s/%s.html" % (HTML_PATH, rname))
 os.system("cp -r images %s/images" %HTML_PATH)
 os.system("chmod 711 %s/images" %HTML_PATH)
 os.system("chmod 644 %s/images/*.*" %HTML_PATH)
+
 print("\033[01;92mSuccess!")
