@@ -20,7 +20,7 @@ Thing's changed! We regularly get a huge class size (over 300 students.) So XXXu
 	<p>[layout-2] [number of students]</p>
 	(see sample_room)
 
-4. run the script: go_brr.py rooms roster.csv
+4. run python3 go_brr.py rooms roster.csv
 
 You can find the output in the out folder :)
 

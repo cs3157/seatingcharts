@@ -7,6 +7,7 @@ import os
 import random
 import sys
 import math
+from csv2pdf import convert
 
 OUT_PATH = "out"
 HTML_PATH = "~/html/seating"
@@ -40,6 +41,7 @@ os.system(f"rm -r {HTML_PATH}")
 os.system("mkdir -p %s" %HTML_PATH)
 os.system("touch %s/seat.csv" %HTML_PATH)
 os.system("chmod 744 %s/seat.csv" %HTML_PATH)
+os.system("echo %s >>  %s/seat.csv" %("Uni, Name, Room, Seat", HTML_PATH))
 os.system("chmod 755 %s" %HTML_PATH)
 
 with open(ROOMS_IN_ORDER, 'r') as f:
@@ -78,11 +80,14 @@ for room in rooms:
     os.system("cp %s/%s/chart_%s.html %s/%s.html" %
               (OUT_PATH, rname, rname, HTML_PATH, rname))
     os.system(f"perl -F, -lane 's/$F[2]/$F[2], {rname}/; print' {OUT_PATH}/{rname}/list_{rname}.csv >> {HTML_PATH}/seat.csv")
-    os.system("cp %s/%s/list_%s.csv %s/%s.csv" %
-              (OUT_PATH, rname, rname, HTML_PATH, rname))
+#    os.system("cp %s/%s/list_%s.csv %s/%s.csv" %
+#              (OUT_PATH, rname, rname, HTML_PATH, rname))
     os.system("chmod 644 %s/%s.html" % (HTML_PATH, rname))
 os.system("cp -r images %s/images" %HTML_PATH)
 os.system("chmod 711 %s/images" %HTML_PATH)
 os.system("chmod 644 %s/images/*.*" %HTML_PATH)
+convert(f"/home/zz2474/html/seating/seat.csv", f"/home/zz2474/html/seating/seat.pdf")
+os.system("chmod 644 /home/zz2474/html/seating/seat.pdf")
+os.system("rm /home/zz2474/html/seating/seat.csv")
 
 print("\033[01;92mSuccess!")
