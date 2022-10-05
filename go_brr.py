@@ -35,6 +35,10 @@ for img in glob.glob("images/*"):
     if img.split('.')[1] == "jpeg":
         os.rename(img, img.split('.')[0]+'.jpg')
 
+os.system("rm -r %s" %HTML_PATH)
+os.system("mkdir -p %s" %HTML_PATH)
+os.system("chmod 711 %s" %HTML_PATH)
+
 with open(ROOMS_IN_ORDER, 'r') as f:
     rooms = f.readlines()
 rooms = [r for r in rooms if r != '\n']
@@ -48,7 +52,7 @@ for room in rooms:
     path = os.path.join(OUT_PATH, rname)
     os.system("rm -rf %s" % path)
     os.mkdir(path)
-    print(("ln -s %s %s" %
+    os.system(("ln -s %s %s" %
            ("images", path + "/" + "images")))
     # print(("cp %s %s" %
     #        ("images", path + "/" + "images")))
@@ -68,6 +72,8 @@ for room in rooms:
               (rname, rname))
     os.system("cp %s/%s/chart_%s.html %s/%s.html" %
               (OUT_PATH, rname, rname, HTML_PATH, rname))
-    os.system("chmod a+xr %s/%s.html" % (HTML_PATH, rname))
-
+    os.system("chmod 644 %s/%s.html" % (HTML_PATH, rname))
+os.system("cp -r images %s/images" %HTML_PATH)
+os.system("chmod 711 %s/images" %HTML_PATH)
+os.system("chmod 644 %s/images/*.*" %HTML_PATH)
 print("\033[01;92mSuccess!")
