@@ -3,76 +3,73 @@
 import csv
 import os
 import smtplib
-import sys
 import time
+import argparse
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 """
 expects a csv file with assignments of the form:
-uni,name,seat
-
-name is ignored. Email is sent to uni@columbia.edu.
+name,seat,email
 """
+# Parse arguments
+parser = argparse.ArgumentParser(
+    description="Cs3157 - Email students the seating arrangement")
+parser.add_argument("email", type=str,
+                    metavar="<sender_email>", help="Sender email address")
+parser.add_argument("name", type=str,
+                    metavar="<sender_name>", help="Sender name")
+parser.add_argument("subject", type=str,
+                    metavar="<subject>", help="Sender name")
+parser.add_argument("list", type=str,
+                    metavar="<student list>", help="Student list")
+parser.add_argument("--re", type=str,
+                    metavar="", default="cucs3157-tas@googlegroups.com", help="Reply to email")
+args = parser.parse_args()
 
-#ADDRESS used as the reply-to address
-ADDRESS = "cucs4118-tas@googlegroups.com"
+print(args.re)
+with open(args.list) as list:
+    students = csv.reader(list)
 
-#the message template, takes one variable which is replaced with the seat number
-subj = "OS Exam 1"
-msg = "You are assigned seat %s."
+    def setup_server():
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(args.email, os.environ["LIONMAIL_DEVICE_PASS"])
+        return server
 
-if len(sys.argv) < 2:
-    print("USAGE: %s <assignment_csv_filename>" % sys.argv[0])
-    sys.exit(1)
+    server = None
 
-filename = sys.argv[1]
+    DEFAULT_BACKOFF = 30  # seconds
+    next_backoff = DEFAULT_BACKOFF
 
-students = csv.reader(open(filename))
+    for toname, seat, email_add in students:
+        msg = f"Hi {toname}, your assigned seat is {seat}."
+        print(f"{msg}, {email_add}.")
 
-fromaddr = "kxc2103@columbia.edu"
-fromname = "Kevin Chen"
+        toaddr = email_add
+        email = MIMEMultipart()
+        email["From"] = f"\"{args.name}\" <{args.email}>"
+        email["To"] = f"\"{toname}\" <{toaddr}>"
+        email["Subject"] = args.subject
+        email["Reply-To"] = args.re
 
-def setup_server():
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-    server.login(fromaddr, os.environ["LIONMAIL_DEVICE_PASS"])
-    return server
+        email.attach(MIMEText(msg, "plain"))
 
-server = None
+        text = email.as_string()
 
-DEFAULT_BACKOFF = 30 # seconds
-next_backoff = DEFAULT_BACKOFF
+        while True:
+            try:
+                if server == None:
+                    server = setup_server()
+                server.sendmail(args.email, toaddr, text)
+                time.sleep(1)
+                next_backoff = DEFAULT_BACKOFF
+                break
+            except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
+                print(f"{e.smtp_code}: {e.smtp_error.decode()}")
+                print(f"Waiting {next_backoff} seconds")
+                time.sleep(next_backoff)
+                next_backoff *= 2
+                server = None
 
-for uni, toname, seat in students:
-    print(uni, msg % seat)
-
-    toaddr = "%s@columbia.edu" % uni
-
-    email = MIMEMultipart()
-    email["From"] = "\"%s\" <%s>" % (fromname, fromaddr)
-    email["To"] = "\"%s\" <%s>" % (toname, toaddr)
-    email["Subject"] = subj
-    email["Reply-To"] = ADDRESS
-
-    body = msg % seat
-    email.attach(MIMEText(body, "plain"))
-
-    text = email.as_string()
-
-    while True:
-        try:
-            if server == None:
-                server = setup_server()
-            server.sendmail(fromaddr, toaddr, text)
-            time.sleep(1)
-            next_backoff = DEFAULT_BACKOFF
-            break
-        except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
-            print(f"{e.smtp_code}: {e.smtp_error.decode()}")
-            print("Waiting %s seconds" % next_backoff)
-            time.sleep(next_backoff)
-            next_backoff *= 2
-            server = None
-
-server.quit()
+    server.quit()
