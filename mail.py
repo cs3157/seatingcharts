@@ -27,49 +27,50 @@ parser.add_argument("--re", type=str,
                     metavar="", default="cucs3157-tas@googlegroups.com", help="Reply to email")
 args = parser.parse_args()
 
-print(args.re)
 with open(args.list) as list:
     students = csv.reader(list)
 
-    def setup_server():
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(args.email, os.environ["LIONMAIL_DEVICE_PASS"])
-        return server
 
-    server = None
+def setup_server():
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.starttls()
+    server.login(args.email, os.environ["LIONMAIL_DEVICE_PASS"])
+    return server
 
-    DEFAULT_BACKOFF = 20  # seconds
-    next_backoff = DEFAULT_BACKOFF
 
-    for toname, seat, email_add in students:
-        msg = f"Hi {toname}, your assigned seat is {seat}."
-        print(f"{msg}, {email_add}.")
+server = None
 
-        toaddr = email_add
-        email = MIMEMultipart()
-        email["From"] = f"\"{args.name}\" <{args.email}>"
-        email["To"] = f"\"{toname}\" <{toaddr}>"
-        email["Subject"] = args.subject
-        email["Reply-To"] = args.re
+DEFAULT_BACKOFF = 20  # seconds
+next_backoff = DEFAULT_BACKOFF
 
-        email.attach(MIMEText(msg, "plain"))
+for toname, seat, email_add in students:
+    msg = f"Hi {toname}, your assigned seat is {seat}."
+    print(f"{msg}, {email_add}.")
 
-        text = email.as_string()
+    toaddr = email_add
+    email = MIMEMultipart()
+    email["From"] = f"\"{args.name}\" <{args.email}>"
+    email["To"] = f"\"{toname}\" <{toaddr}>"
+    email["Subject"] = args.subject
+    email["Reply-To"] = args.re
 
-        while True:
-            try:
-                if server == None:
-                    server = setup_server()
-                server.sendmail(args.email, toaddr, text)
-                time.sleep(1)
-                next_backoff = DEFAULT_BACKOFF
-                break
-            except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
-                print(f"{e.smtp_code}: {e.smtp_error.decode()}")
-                print(f"Waiting {next_backoff} seconds")
-                time.sleep(next_backoff)
-                next_backoff *= 2
-                server = None
+    email.attach(MIMEText(msg, "plain"))
 
-    server.quit()
+    text = email.as_string()
+
+    while True:
+        try:
+            if server == None:
+                server = setup_server()
+            server.sendmail(args.email, toaddr, text)
+            time.sleep(1)
+            next_backoff = DEFAULT_BACKOFF
+            break
+        except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
+            print(f"{e.smtp_code}: {e.smtp_error.decode()}")
+            print(f"Waiting {next_backoff} seconds")
+            time.sleep(next_backoff)
+            next_backoff *= 2
+            server = None
+
+server.quit()
