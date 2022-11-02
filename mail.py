@@ -39,7 +39,7 @@ with open(args.list) as list:
 
     server = None
 
-    DEFAULT_BACKOFF = 30  # seconds
+    DEFAULT_BACKOFF = 20  # seconds
     next_backoff = DEFAULT_BACKOFF
 
     for toname, seat, email_add in students:
