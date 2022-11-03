@@ -14,7 +14,7 @@ import template
 
 def assert_file_exists(path):
     if not os.path.isfile(path):
-        print("Missing required file: {}".format(path))
+        print(f"Missing required file: {path}")
         exit(1)
 
 
@@ -23,7 +23,7 @@ def working_dir_path(name, slug, extension):
     generates paths in the format:
     out/3157-2017-9-final/roster_3157-2017-9-final.html
     """
-    filename = "{}_{}.{}".format(name, slug, extension)
+    filename = f"{name}_{slug}.{extension}"
     return os.path.join("out", slug, filename)
 
 
@@ -98,7 +98,7 @@ assert_file_exists(layout_path)
 LAYOUT = layout_path
 
 # outputs:
-TITLE = args.title if args.title != None else "{} Seating".format(args.slug)
+TITLE = args.title if args.title != None else f"{args.slug} Seating"
 
 # a CSV student id ordered list of assigned seats
 OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
@@ -176,8 +176,8 @@ with open(OUTPUT_HTML, "w") as html:
     html.write(template.css.format(TITLE))
     # sort by uni
     for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):
-        html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
-                   % (student[2], seat))
+        html.write(
+            f"""<div><span class="uni">{student[2]}</span> <span class="seat">{seat}</span></div>""")
     html.write("""</div></body>\n""")
 
 
@@ -216,15 +216,15 @@ with open(OUTPUT_CHART, "w") as seating_chart:
                 img_rel_path = os.path.join(
                     photos_path, name + ".jpg")  # Inserted into HTML
                 if os.path.isfile(img_path):
-                    seating_chart.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
-                                        % (seat, uni, name, img_rel_path))
+                    seating_chart.write(
+                        f"""<span class="seat">{seat}</span><br> {uni}<br> <span class="name">{name}</span><br> <img src="{img_rel_path}">""")
                 else:
                     print(f"WARNING: no img found for {img_path}")
-                    seating_chart.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> """
-                                        % (seat, uni, name))
+                    seating_chart.write(
+                        f"""<span class="seat">{seat}</span><br> {uni}<br> <span class="name">{name}</span><br> """)
             except KeyError:
                 seating_chart.write(
-                    """<span class="seat">%s</span>""" % (seat))
+                    f"""<span class="seat">{seat}</span>""")
             seating_chart.write("</td>\n")
 
         for i in range(maxrow - row_count):

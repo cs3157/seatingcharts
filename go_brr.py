@@ -7,7 +7,6 @@ import os
 import random
 import sys
 import math
-from csv2pdf import convert
 
 OUT_PATH = "out"
 HTML_PATH = "~/html/seating"
@@ -38,11 +37,11 @@ for img in glob.glob("images/*"):
         os.rename(img, img.split('.')[0]+'.jpg')
 
 os.system(f"rm -r {HTML_PATH}")
-os.system("mkdir -p %s" %HTML_PATH)
-os.system("touch %s/seat.csv" %HTML_PATH)
-os.system("chmod 744 %s/seat.csv" %HTML_PATH)
-os.system("echo %s >>  %s/seat.csv" %("Uni, Name, Room, Seat", HTML_PATH))
-os.system("chmod 755 %s" %HTML_PATH)
+os.system("mkdir -p %s" % HTML_PATH)
+os.system("touch %s/seat.csv" % HTML_PATH)
+os.system("chmod 744 %s/seat.csv" % HTML_PATH)
+os.system("echo %s >>  %s/seat.csv" % ("Uni, Name, Room, Seat", HTML_PATH))
+os.system("chmod 755 %s" % HTML_PATH)
 
 with open(ROOMS_IN_ORDER, 'r') as f:
     rooms = f.readlines()
@@ -59,7 +58,7 @@ for room in rooms:
     os.system("rm -rf %s" % path)
     os.mkdir(path)
     os.system(("ln -s %s %s" %
-           ("images", path + "/" + "images")))
+               ("images", path + "/" + "images")))
     # print(("cp %s %s" %
     #        ("images", path + "/" + "images")))
     # os.system(("cp -rf %s %s" %
@@ -69,24 +68,27 @@ for room in rooms:
     output.writerow("")
     output.writerow("")
     for i in range(math.ceil(student_count / seat_count * int(room[1]))):
-#    for i in range(int(room[1])):
+        #    for i in range(int(room[1])):
         if(len(students) > 0):
             student = random.choice(students)
             output.writerow(student)
             students.remove(student)
     csvfile.flush()
+    print(f"rname:{rname}")
     os.system("./seatingchart.py %s %s" %
               (rname, rname))
     os.system("cp %s/%s/chart_%s.html %s/%s.html" %
               (OUT_PATH, rname, rname, HTML_PATH, rname))
-    os.system(f"perl -F, -lane 's/$F[2]/$F[2], {rname}/; print' {OUT_PATH}/{rname}/list_{rname}.csv >> {HTML_PATH}/seat.csv")
+    os.system(
+        f"perl -F, -lane 's/$F[2]/$F[2], {rname}/; print' {OUT_PATH}/{rname}/list_{rname}.csv >> {HTML_PATH}/seat.csv")
 #    os.system("cp %s/%s/list_%s.csv %s/%s.csv" %
 #              (OUT_PATH, rname, rname, HTML_PATH, rname))
     os.system("chmod 644 %s/%s.html" % (HTML_PATH, rname))
-os.system("cp -r images %s/images" %HTML_PATH)
-os.system("chmod 711 %s/images" %HTML_PATH)
-os.system("chmod 644 %s/images/*.*" %HTML_PATH)
-convert(f"/home/zz2474/html/seating/seat.csv", f"/home/zz2474/html/seating/seat.pdf")
+os.system("cp -r images %s/images" % HTML_PATH)
+os.system("chmod 711 %s/images" % HTML_PATH)
+os.system("chmod 644 %s/images/*.*" % HTML_PATH)
+# convert(f"/home/zz2474/html/seating/seat.csv",
+#         f"/home/zz2474/html/seating/seat.pdf")
 os.system("chmod 644 /home/zz2474/html/seating/seat.pdf")
 os.system("rm /home/zz2474/html/seating/seat.csv")
 
