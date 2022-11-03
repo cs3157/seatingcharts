@@ -9,7 +9,7 @@ import itertools
 import csv
 import os
 import random
-import sys
+import template
 
 
 def assert_file_exists(path):
@@ -173,27 +173,9 @@ if args.lefty:
 
 # Write out the HTML roster
 with open(OUTPUT_HTML, "w") as html:
-    html.write("""<style>
-            .seat {
-                padding-left: 1em;
-                margin-bottom: .2em;
-            }
-            .name {
-                font-size: 9pt;
-            }
-            .assignments {
-                -webkit-column-count: 4; /* Chrome, Safari, Opera */
-                -moz-column-count: 4; /* Firefox */
-                column-count: 4;
-            }
-            h3 {
-                text-align: center;
-            }
-            </style>
-    <body>
-    <h3>%s</h3>
-    <div class="assignments">\n\n""" % TITLE)
-    for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):  # sort by uni
+    html.write(template.css.format(TITLE))
+    # sort by uni
+    for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):
         html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
                    % (student[2], seat))
     html.write("""</div></body>\n""")
@@ -210,47 +192,7 @@ room = [s for s in csv.reader(open(LAYOUT), delimiter="\t")]
 maxrow = max([len(x) for x in room])
 
 with open(OUTPUT_CHART, "w") as seating_chart:
-    seating_chart.write("""
-    <style>
-            table {
-                table-layout: fixed;
-                width: 100%;
-            }
-            img {
-                width: 60px;
-                vertical-align: text-bottom;
-            }
-            .seat {
-                font-weight: bold;
-                font-size: 14pt;
-                vertical-align: top;
-            }
-            .name {
-                font-size: 9pt;
-            }
-            td {
-                text-align: center;
-                vertical-align: baseline;
-                width: 70px;
-            }
-            .unselected {
-                background-color: white;
-            }
-            .selected {
-                background-color: orange;
-            }
-    </style>
-
-    <script>
-        function selectStudent(cell) {
-            if (cell.className === "unselected") {
-                cell.className = "selected";
-            } else {
-                cell.className = "unselected";
-            }
-        }
-    </script>
-    <body><table border=1>\n\n""")
+    seating_chart.write(template.header)
     for row in room:
         seating_chart.write("<tr>")
         row_count = 0
