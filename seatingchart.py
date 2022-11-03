@@ -148,10 +148,10 @@ def arrange_seat(slug: str, layout: str, title: str = None, lefty: bool = False,
     with open(OUTPUT_HTML, "w") as html:
         html.write(template.css.format(TITLE))
         # sort by uni
-        for seat, student in sorted(assignments.items(), key=lambda x: x[1][0]):
+        for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):
             # for seat, student in assignments.items():
             html.write(
-                f"""<div><span class="uni">{student[0]}</span> <span class="seat">{seat}</span></div>""")
+                f"""<div><span class="uni">{student[2]}</span> <span class="seat">{seat}</span></div>""")
         html.write("""</div></body>\n""")
 
     # dump to CSV as well
@@ -176,17 +176,17 @@ def arrange_seat(slug: str, layout: str, title: str = None, lefty: bool = False,
 
                 try:
                     student = assignments[seat]
-                    uni = student[0]
-                    name = student[1]
-                    full_name = student[1].split(", ")
+                    uni = student[2]
+                    name = student[0]
+                    full_name = student[0].split(", ")
                     full_name = f"{full_name[1]} {full_name[0]}"
                     # Used to check if file exists
                     # img_path = os.path.join(photos_path, uni + ".jpg")
-                    img_path = os.path.join(photos_path, name + ".jpg")
+                    img_path = os.path.join(photos_path, uni + ".jpg")
                     # img_rel_path = os.path.join(
                     #     slug + "_files", uni + ".jpg")  # Inserted into HTML
                     img_rel_path = os.path.join(
-                        photos_path, name + ".jpg")  # Inserted into HTML
+                        photos_path, uni + ".jpg")  # Inserted into HTML
                     if os.path.isfile(img_path):
                         seating_chart.write(
                             f"""<span class="seat">{seat}</span><br> {uni}<br> <span class="name">{name}</span><br> <img src="{img_rel_path}">""")
