@@ -10,7 +10,9 @@ import seatingchart
 import shutil
 
 
-def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: str = "~/html/seating", image_path: str = "images"):
+def main(rooms_order: str, student_list: str, out_path: str = "out",
+         html_path: str = "~/html/seating", image_path: str = "images"):
+
     students = [tuple(s) for s in csv.reader(open(student_list))][3:]
     random.shuffle(students)
     student_count = len(students)
@@ -21,8 +23,10 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
     rooms = [r for r in rooms if r != '\n']
     rooms = list([z.strip().split() for z in rooms])
     print(f"rooms:{rooms}")
+
     for _, count in rooms:
         seat_count += int(count)
+
     if seat_count == student_count:
         print(f"Total seats:{seat_count}")
     elif seat_count < student_count:
@@ -32,6 +36,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
     elif seat_count > student_count:
         print(
             f"Total seats:{seat_count} > students:{student_count}, More seats than students; are you sure?")
+
     # fix jpeg in images
     for img in glob.glob(f"{image_path}/*"):
         if img.split('.')[1] == "jpeg":
@@ -43,21 +48,24 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
         pass
     shutil.rmtree(html_path, ignore_errors=True)
     os.makedirs(html_path, mode=0o755, exist_ok=True)
+
     for room in rooms:
         rname = room[0]
         path = os.path.join(out_path, rname)
-        shutil.rmtree(path)
+        shutil.rmtree(path, ignore_errors=True)
         os.mkdir(path)
         # os.system(("ln -s %s %s" %
         #            ("images", path + "/" + "images")))
         with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
             output = csv.writer(csvfile)
+
             # for i in range(int(room[1])):
             for i in range(math.ceil(student_count / seat_count * int(room[1]))):
                 if(len(students) > 0):
                     student = random.choice(students)
                     output.writerow(student)
                     students.remove(student)
+
             csvfile.flush()
         seatingchart.arrange_seat(rname, rname)
         shutil.copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"),
@@ -75,7 +83,6 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Go brrr with the seating charts")
-
     parser.add_argument("rooms",
                         type=str,
                         metavar='<rooms>', help='Room seats allocation')
@@ -89,6 +96,5 @@ if __name__ == "__main__":
                         type=str, default="~/html/seating",
                         metavar='', help='HTML Path')
     args = parser.parse_args()
-    rooms_order = args.rooms
-    student_list = args.roster
+
     main(args.rooms, args.roster, args.out, args.html)
