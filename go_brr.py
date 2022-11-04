@@ -7,6 +7,8 @@ import os
 import random
 import math
 import seatingchart
+import shutil
+import pandas
 
 
 def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: str = "~/html/seating", image_path: str = "images"):
@@ -30,25 +32,21 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
         return
     elif seat_count > student_count:
         print(
-            f"Total seats:{seat_count} > students:{student_count}, are you sure?")
-
+            f"Total seats:{seat_count} > students:{student_count}, More seats than students; are you sure?")
+    # fix jpeg in images
     for img in glob.glob(f"{image_path}/*"):
         if img.split('.')[1] == "jpeg":
             os.rename(img, img.split('.')[0]+'.jpg')
-
-    os.system(f"rm -r {html_path}")
-    os.system(f"mkdir -p {html_path}")
-    os.system(f"touch {html_path}/seat.csv")
-    os.system(f"chmod 744 {html_path}/seat.csv")
-    os.system(f"chmod 755 {html_path}")
-
+    html_path = os.path.expanduser(html_path)
+    shutil.rmtree(html_path, ignore_errors=True)
+    os.makedirs(html_path, mode=0o755, exist_ok=True)
     for room in rooms:
         rname = room[0]
         path = os.path.join(out_path, rname)
-        os.system("rm -rf %s" % path)
+        shutil.rmtree(path)
         os.mkdir(path)
-        os.system(("ln -s %s %s" %
-                   ("images", path + "/" + "images")))
+        # os.system(("ln -s %s %s" %
+        #            ("images", path + "/" + "images")))
         with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
             output = csv.writer(csvfile)
             for i in range(math.ceil(student_count / seat_count * int(room[1]))):
@@ -58,11 +56,13 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
                     students.remove(student)
             csvfile.flush()
         seatingchart.arrange_seat(rname, rname)
-        os.system("cp %s/%s/chart_%s.html %s/%s.html" %
-                  (out_path, rname, rname, html_path, rname))
-        os.system(f"chmod 644 {html_path}/{rname}.html")
-    os.system(f"cp -r images {html_path}/images")
-    os.system(f"chmod 711 {html_path}/images")
+        shutil.copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"),
+                        os.path.join(html_path, f"{rname}.html"))
+        os.chmod(os.path.join(html_path, f"{rname}.html"), mode=0o644)
+    image_path = os.path.join(os.getcwd(), image_path)
+    shutil.copytree(image_path, os.path.join(html_path, "images"))
+    os.chmod(os.path.join(html_path, "images"), mode=0o711)
+    # os.chmod can't do that
     os.system(f"chmod 644 {html_path}/images/*.*")
 
     print("\033[01;92mSuccess!")
