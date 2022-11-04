@@ -8,11 +8,10 @@ import random
 import math
 import seatingchart
 import shutil
-import pandas
 
 
 def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: str = "~/html/seating", image_path: str = "images"):
-    students = [tuple(s) for s in csv.reader(open(student_list))][3:-30]
+    students = [tuple(s) for s in csv.reader(open(student_list))][3:]
     random.shuffle(students)
     student_count = len(students)
     seat_count = 0
@@ -38,6 +37,10 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
         if img.split('.')[1] == "jpeg":
             os.rename(img, img.split('.')[0]+'.jpg')
     html_path = os.path.expanduser(html_path)
+    try:
+        os.remove(os.path.join(out_path, "seat.csv"))
+    except OSError:
+        pass
     shutil.rmtree(html_path, ignore_errors=True)
     os.makedirs(html_path, mode=0o755, exist_ok=True)
     for room in rooms:
@@ -49,6 +52,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out", html_path: 
         #            ("images", path + "/" + "images")))
         with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
             output = csv.writer(csvfile)
+            # for i in range(int(room[1])):
             for i in range(math.ceil(student_count / seat_count * int(room[1]))):
                 if(len(students) > 0):
                     student = random.choice(students)
