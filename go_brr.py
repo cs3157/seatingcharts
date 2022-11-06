@@ -22,7 +22,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
         with open(rooms_order, 'r') as f:
             rooms = f.readlines()
         rooms = [r for r in rooms if r != '\n']
-        rooms = list([z.strip().split() for z in rooms])
+        rooms = [z.strip().split() for z in rooms]
         print(f"rooms:{rooms}")
 
         for _, count in rooms:
@@ -40,8 +40,8 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
 
         # fix jpeg in images
         for img in glob.glob(f"{image_path}/*"):
-            if img.split('.')[1] == "jpeg":
-                os.rename(img, img.split('.')[0]+'.jpg')
+            if img.split('.')[-1] == "jpeg":
+                os.rename(img, img.split('.')[:-1]+'.jpg')
         html_path = os.path.expanduser(html_path)
         try:
             os.remove(os.path.join(out_path, "seat.csv"))
@@ -50,8 +50,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
         shutil.rmtree(html_path, ignore_errors=True)
         os.makedirs(html_path, mode=0o755, exist_ok=True)
 
-        for room in rooms:
-            rname = room[0]
+        for rname, num in rooms:
             path = os.path.join(out_path, rname)
             shutil.rmtree(path, ignore_errors=True)
             os.mkdir(path)
@@ -61,7 +60,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
                 output = csv.writer(csvfile)
 
                 # for i in range(int(room[1])):
-                for i in range(math.ceil(student_count / seat_count * int(room[1]))):
+                for i in range(math.ceil(student_count / seat_count * int(num))):
                     if(len(students) > 0):
                         student = random.choice(students)
                         output.writerow(student)
@@ -90,10 +89,10 @@ if __name__ == "__main__":
     parser.add_argument("roster",
                         type=str,
                         metavar='<roster>', help='Student roster from courseworks')
-    parser.add_argument("--out", "--O",
+    parser.add_argument("--out", "-o",
                         type=str, default="out",
                         metavar='', help='Output Path')
-    parser.add_argument("--html", "--H",
+    parser.add_argument("--html", "-h",
                         type=str, default="~/html/seating",
                         metavar='', help='HTML Path')
     args = parser.parse_args()
