@@ -15,62 +15,62 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
 
     with open(student_list) as s_l:
         students = [tuple(s) for s in csv.reader(s_l)][3:]
-        random.shuffle(students)
-        student_count = len(students)
-        seat_count = 0
-        # check if the total seats is enough
-        with open(rooms_order, 'r') as f:
-            rooms = f.readlines()
-        rooms = [r for r in rooms if r != '\n']
-        rooms = [z.strip().split() for z in rooms]
-        print(f"rooms:{rooms}")
+    random.shuffle(students)
+    student_count = len(students)
+    seat_count = 0
+    # check if the total seats is enough
+    with open(rooms_order, 'r') as f:
+        rooms = f.readlines()
+    rooms = [r for r in rooms if r != '\n']
+    rooms = [z.strip().split() for z in rooms]
+    print(f"rooms:{rooms}")
 
-        for _, count in rooms:
-            seat_count += int(count)
+    for _, count in rooms:
+        seat_count += int(count)
 
-        if seat_count == student_count:
-            print(f"Total seats:{seat_count}")
-        elif seat_count < student_count:
-            print(
-                f"Total seats:{seat_count} < students:{student_count}, it won't work!")
-            return
-        elif seat_count > student_count:
-            print(
-                f"Total seats:{seat_count} > students:{student_count}, More seats than students; are you sure?")
+    if seat_count == student_count:
+        print(f"Total seats:{seat_count}")
+    elif seat_count < student_count:
+        print(
+            f"Total seats:{seat_count} < students:{student_count}, it won't work!")
+        return
+    elif seat_count > student_count:
+        print(
+            f"Total seats:{seat_count} > students:{student_count}, More seats than students; are you sure?")
 
-        # fix jpeg in images
-        for img in glob.glob(f"{image_path}/*"):
-            if img.split('.')[-1] == "jpeg":
-                os.rename(img, img.split('.')[:-1]+'.jpg')
-        html_path = os.path.expanduser(html_path)
-        try:
-            os.remove(os.path.join(out_path, "seat.csv"))
-        except OSError:
-            pass
-        shutil.rmtree(html_path, ignore_errors=True)
-        os.makedirs(html_path, mode=0o755, exist_ok=True)
+    # fix jpeg in images
+    for img in glob.glob(f"{image_path}/*"):
+        if img.split('.')[-1] == "jpeg":
+            os.rename(img, img.split('.')[:-1]+'.jpg')
+    html_path = os.path.expanduser(html_path)
+    try:
+        os.remove(os.path.join(out_path, "seat.csv"))
+    except OSError:
+        pass
+    shutil.rmtree(html_path, ignore_errors=True)
+    os.makedirs(html_path, mode=0o755, exist_ok=True)
 
-        for rname, num in rooms:
-            path = os.path.join(out_path, rname)
-            shutil.rmtree(path, ignore_errors=True)
-            os.mkdir(path)
-            # os.system(("ln -s %s %s" %
-            #            ("images", path + "/" + "images")))
-            with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
-                output = csv.writer(csvfile)
+    for rname, num in rooms:
+        path = os.path.join(out_path, rname)
+        shutil.rmtree(path, ignore_errors=True)
+        os.mkdir(path)
+        # os.system(("ln -s %s %s" %
+        #            ("images", path + "/" + "images")))
+        with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
+            output = csv.writer(csvfile)
 
-                # for i in range(int(room[1])):
-                for i in range(math.ceil(student_count / seat_count * int(num))):
-                    if(len(students) > 0):
-                        student = random.choice(students)
-                        output.writerow(student)
-                        students.remove(student)
+            # for i in range(int(room[1])):
+            for i in range(math.ceil(student_count / seat_count * int(num))):
+                if(len(students) > 0):
+                    student = random.choice(students)
+                    output.writerow(student)
+                    students.remove(student)
 
-                csvfile.flush()
-        seatingchart.arrange_seat(rname, rname)
-        shutil.copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"),
-                        os.path.join(html_path, f"{rname}.html"))
-        os.chmod(os.path.join(html_path, f"{rname}.html"), mode=0o644)
+            csvfile.flush()
+    seatingchart.arrange_seat(rname, rname)
+    shutil.copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"),
+                    os.path.join(html_path, f"{rname}.html"))
+    os.chmod(os.path.join(html_path, f"{rname}.html"), mode=0o644)
     image_path = os.path.join(os.getcwd(), image_path)
     shutil.copytree(image_path, os.path.join(html_path, "images"))
     os.chmod(os.path.join(html_path, "images"), mode=0o711)
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument("--out", "-o",
                         type=str, default="out",
                         metavar='', help='Output Path')
-    parser.add_argument("--html", "-h",
+    parser.add_argument("--html",
                         type=str, default="~/html/seating",
                         metavar='', help='HTML Path')
     args = parser.parse_args()

@@ -61,8 +61,7 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
         assign_last_path) else "/dev/null"
 
     # photos_path = os.path.join("out", slug, slug + "_files")
-    photos_path = os.path.join(
-        "images")
+    photos_path = os.path.join("images")
     csv_sum = os.path.join(output, "seat.csv")
 
     # 3) a tsv file containing the format of the room
@@ -71,7 +70,7 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
     LAYOUT = layout_path
 
     # outputs:
-    TITLE = title if title != None else f"{slug} Seating"
+    TITLE = title if title else f"{slug} Seating"
 
     # a CSV student id ordered list of assigned seats
     OUTPUT_CSV = working_dir_path("list", slug, "csv")
@@ -91,11 +90,13 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
     seats = list(itertools.chain.from_iterable(
         [z.strip().split() for z in seats]))
 
-    assign_last = [x.strip() for x in open(ASSIGN_LAST).readlines()]
-    assign_first = [x.strip() for x in open(ASSIGN_FIRST).readlines()]
+    with open(ASSIGN_LAST) as a_l:
+        assign_last = [x.strip() for x in a_l.readlines()]
+    with open(ASSIGN_FIRST) as a_f:
+        assign_first = [x.strip() for x in a_f.readlines()]
 
-    students = [tuple(s) for s in csv.reader(
-        open(STUDENT_LIST))]  # Skip two header rows
+    with open(STUDENT_LIST) as s_l:
+        students = [tuple(s) for s in csv.reader(s_l)]
     random.shuffle(students)
 
     # the assign_first/last students are shuffled randomly, so we need to pull them to the front/back
@@ -176,7 +177,7 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
             row_count = 0
 
             for seat in row:
-                row_count = row_count + 1
+                row_count += 1
                 seating_chart.write(
                     "<td class='unselected' onclick='selectStudent(this)' >\n")
 
