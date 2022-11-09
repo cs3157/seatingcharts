@@ -5,11 +5,11 @@ Seating Chart script. See https://github.com/cs3157/seatingcharts
 """
 
 import argparse
-import itertools
 import csv
+import itertools
 import os
 import random
-import template
+from template import css, header
 
 
 def assert_file_exists(path):
@@ -148,7 +148,7 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
 
     # Write out the HTML roster
     with open(OUTPUT_HTML, "w") as html:
-        html.write(template.css.format(TITLE))
+        html.write(css.format(TITLE))
         # sort by uni
         for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):
             # for seat, student in assignments.items():
@@ -171,7 +171,7 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
     maxrow = max([len(x) for x in room])
 
     with open(OUTPUT_CHART, "w") as seating_chart:
-        seating_chart.write(template.header)
+        seating_chart.write(header)
         for row in room:
             seating_chart.write("<tr>")
             row_count = 0

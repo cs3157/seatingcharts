@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import argparse
+
+from argparse import ArgumentParser
 import csv
 import glob
+import math
 import os
 import random
-import math
-import seatingchart
-import shutil
+from shutil import copytree, rmtree, copyfile
+from seatingchart import arrange_seat
 
 
 def main(rooms_order: str, student_list: str, out_path: str = "out",
@@ -47,12 +48,12 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
         os.remove(os.path.join(out_path, "seat.csv"))
     except OSError:
         pass
-    shutil.rmtree(html_path, ignore_errors=True)
+    rmtree(html_path, ignore_errors=True)
     os.makedirs(html_path, mode=0o755, exist_ok=True)
 
     for rname, num in rooms:
         path = os.path.join(out_path, rname)
-        shutil.rmtree(path, ignore_errors=True)
+        rmtree(path, ignore_errors=True)
         os.mkdir(path)
         # os.system(("ln -s %s %s" %
         #            ("images", path + "/" + "images")))
@@ -67,12 +68,12 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
                     students.remove(student)
 
             csvfile.flush()
-    seatingchart.arrange_seat(rname, rname)
-    shutil.copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"),
-                    os.path.join(html_path, f"{rname}.html"))
+    arrange_seat(rname, rname)
+    copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"),
+             os.path.join(html_path, f"{rname}.html"))
     os.chmod(os.path.join(html_path, f"{rname}.html"), mode=0o644)
     image_path = os.path.join(os.getcwd(), image_path)
-    shutil.copytree(image_path, os.path.join(html_path, "images"))
+    copytree(image_path, os.path.join(html_path, "images"))
     os.chmod(os.path.join(html_path, "images"), mode=0o711)
     # os.chmod can't do that
     os.system(f"chmod 644 {html_path}/images/*.*")
@@ -81,7 +82,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description="Go brrr with the seating charts")
     parser.add_argument("rooms",
                         type=str,
