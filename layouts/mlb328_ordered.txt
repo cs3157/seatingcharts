@@ -1,0 +1,11 @@
+#A11, B18, C16, D4, D8 are lefty seats
+#C2 is broken/not there lol
+A1 A3 A5 A7 A9
+
+B1 B3 B5 B7 B9 B11 B13 B15 B17
+
+C1 C3 C5 C7 C9 C11 C13 C15
+
+D1 D3
+
+D5 D7
