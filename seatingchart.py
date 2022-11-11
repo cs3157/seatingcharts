@@ -9,6 +9,7 @@ import csv
 import itertools
 import os
 import random
+
 from template import css, header
 
 

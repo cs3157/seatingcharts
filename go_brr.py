@@ -6,17 +6,18 @@ import csv
 import glob
 import math
 import os
-import random
+from random import shuffle, choice
 from shutil import copytree, rmtree, copyfile
+
 from seatingchart import arrange_seat
 
 
 def main(rooms_order: str, student_list: str, out_path: str = "out",
-         html_path: str = "~/html/seating", image_path: str = "images"):
+         html_path: str = "~/html/seating", image_path: str = "images", lefty: bool = False):
 
     with open(student_list) as s_l:
         students = [tuple(s) for s in csv.reader(s_l)][3:]
-    random.shuffle(students)
+    shuffle(students)
     student_count = len(students)
     seat_count = 0
     # check if the total seats is enough
@@ -62,8 +63,8 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
 
             # for i in range(int(room[1])):
             for i in range(math.ceil(student_count / seat_count * int(num))):
-                if(len(students) > 0):
-                    student = random.choice(students)
+                if (len(students) > 0):
+                    student = choice(students)
                     output.writerow(student)
                     students.remove(student)
 
@@ -96,6 +97,9 @@ if __name__ == "__main__":
     parser.add_argument("--html",
                         type=str, default="~/html/seating",
                         metavar='', help='HTML Path')
+    parser.add_argument("--lefty", "-l",
+                        type=bool, default=False,
+                        metavar='', help='Lefty Students')
     args = parser.parse_args()
 
     main(args.rooms, args.roster, args.out, args.html)
