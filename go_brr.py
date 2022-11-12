@@ -18,9 +18,13 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
     with open(student_list) as s_l:
         students = [tuple(s) for s in csv.reader(s_l)][3:]
     shuffle(students)
-    # shuffle(lefty_students)
     student_count = len(students)
     seat_count = 0
+    l_student_list = os.path.join("lefty_" + student_list)
+    with open(l_student_list) as l_l:
+        l_students = [tuple(s) for s in csv.reader(l_l)]
+    shuffle(l_students)
+    student_count = len(students)
     # check if the total seats is enough
     with open(rooms_order, 'r') as f:
         rooms = f.readlines()
@@ -56,10 +60,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
 
     for rname, num, lefty in rooms:
         path = os.path.join(out_path, rname)
-        # rmtree(path, ignore_errors=True)
         os.mkdir(path)
-        # os.system(("ln -s %s %s" %
-        #            ("images", path + "/" + "images")))
         with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
             output = csv.writer(csvfile)
 
@@ -71,7 +72,22 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
                     students.remove(student)
 
             csvfile.flush()
-        arrange_seat(rname, rname)
+
+        if int(lefty):
+            with open(os.path.join(path, "lefty_roster_" + rname + ".csv"), "w") as csvfile:
+                output = csv.writer(csvfile)
+
+                for _ in range(int(lefty)):
+                    # for i in range(math.ceil(student_count / seat_count * int(num))):
+                    if (len(l_students) > 0):
+                        l_student = choice(l_students)
+                        output.writerow(l_student)
+                        l_students.remove(l_student)
+
+                csvfile.flush()
+            arrange_seat(rname, rname, lefty=True)
+        else:
+            arrange_seat(rname, rname, lefty=False)
         # lefty seat
         copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"), os.path.join(
             html_path, f"{rname}.html"))
