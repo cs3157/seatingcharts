@@ -46,7 +46,8 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
             os.rename(img, img.split('.')[:-1]+'.jpg')
     html_path = os.path.expanduser(html_path)
     try:
-        os.remove(os.path.join(out_path, "seat.csv"))
+        rmtree(os.path.join(out_path), ignore_errors=True)
+        os.makedirs(os.path.join(out_path), mode=0o755, exist_ok=True)
     except OSError:
         pass
     rmtree(html_path, ignore_errors=True)
@@ -61,18 +62,18 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
         with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
             output = csv.writer(csvfile)
 
-            # for i in range(int(room[1])):
-            for i in range(math.ceil(student_count / seat_count * int(num))):
+            for i in range(int(num)):
+                # for i in range(math.ceil(student_count / seat_count * int(num))):
                 if (len(students) > 0):
                     student = choice(students)
                     output.writerow(student)
                     students.remove(student)
 
             csvfile.flush()
-    arrange_seat(rname, rname)
-    copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"),
-             os.path.join(html_path, f"{rname}.html"))
-    os.chmod(os.path.join(html_path, f"{rname}.html"), mode=0o644)
+        arrange_seat(rname, rname)
+        copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"), os.path.join(
+            html_path, f"{rname}.html"))
+        os.chmod(os.path.join(html_path, f"{rname}.html"), mode=0o644)
     image_path = os.path.join(os.getcwd(), image_path)
     copytree(image_path, os.path.join(html_path, "images"))
     os.chmod(os.path.join(html_path, "images"), mode=0o711)
