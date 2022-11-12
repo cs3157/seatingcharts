@@ -8,6 +8,7 @@ import math
 import os
 from random import shuffle, choice
 from shutil import copytree, rmtree, copyfile
+from csv2pdf import convert
 
 from seatingchart import arrange_seat
 
@@ -57,7 +58,8 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
         pass
     rmtree(html_path, ignore_errors=True)
     os.makedirs(html_path, mode=0o755, exist_ok=True)
-
+    with open(os.path.join(out_path, "seat.csv"), "w+") as s_f:
+        csv.writer(s_f).writerow(["Name", "UNI", "Room", "Seat"])
     for rname, num, lefty in rooms:
         path = os.path.join(out_path, rname)
         os.mkdir(path)
@@ -97,6 +99,8 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
     os.chmod(os.path.join(html_path, "images"), mode=0o711)
     # os.chmod can't do that
     os.system(f"chmod 644 {html_path}/images/*.*")
+    convert(os.path.join(out_path, "seat.csv"),
+            os.path.join(html_path, "seat.pdf"))
 
     print("\033[01;92mSuccess!")
 
