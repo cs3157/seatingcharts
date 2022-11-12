@@ -18,6 +18,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
     with open(student_list) as s_l:
         students = [tuple(s) for s in csv.reader(s_l)][3:]
     shuffle(students)
+    # shuffle(lefty_students)
     student_count = len(students)
     seat_count = 0
     # check if the total seats is enough
@@ -27,7 +28,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
     rooms = [z.strip().split() for z in rooms]
     print(f"rooms:{rooms}")
 
-    for _, count in rooms:
+    for _, count, lefty in rooms:
         seat_count += int(count)
 
     if seat_count == student_count:
@@ -53,16 +54,16 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
     rmtree(html_path, ignore_errors=True)
     os.makedirs(html_path, mode=0o755, exist_ok=True)
 
-    for rname, num in rooms:
+    for rname, num, lefty in rooms:
         path = os.path.join(out_path, rname)
-        rmtree(path, ignore_errors=True)
+        # rmtree(path, ignore_errors=True)
         os.mkdir(path)
         # os.system(("ln -s %s %s" %
         #            ("images", path + "/" + "images")))
         with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
             output = csv.writer(csvfile)
 
-            for i in range(int(num)):
+            for _ in range(int(num)):
                 # for i in range(math.ceil(student_count / seat_count * int(num))):
                 if (len(students) > 0):
                     student = choice(students)
@@ -71,6 +72,7 @@ def main(rooms_order: str, student_list: str, out_path: str = "out",
 
             csvfile.flush()
         arrange_seat(rname, rname)
+        # lefty seat
         copyfile(os.path.join(out_path, rname, f"chart_{rname}.html"), os.path.join(
             html_path, f"{rname}.html"))
         os.chmod(os.path.join(html_path, f"{rname}.html"), mode=0o644)
