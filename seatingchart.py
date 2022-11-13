@@ -132,7 +132,7 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
         lseats = list(itertools.chain.from_iterable(
             [z.strip().split() for z in lseats]))
 
-        lstudents = [tuple(s) for s in csv.reader(open(LSTUDENT_LIST))][2:]
+        lstudents = [tuple(s) for s in csv.reader(open(LSTUDENT_LIST))]
         random.shuffle(lstudents)
 
         for lseat in lseats:
@@ -161,11 +161,11 @@ def arrange_seat(slug: str, layout: str, title: str = None, output: str = "out",
     with open(OUTPUT_CSV, "w") as o_csv:
         output = csv.writer(o_csv)
         for seat, uni in assignments.items():
-            output.writerow(list(uni)[:1] + [slug] + [seat])
+            output.writerow(list(uni)[:1] + list(uni)[2:3] + [slug] + [seat])
     with open(csv_sum, "a") as o_csv:
         output = csv.writer(o_csv)
         for seat, uni in assignments.items():
-            output.writerow(list(uni)[:1] + [slug] + [seat])
+            output.writerow(list(uni)[:1] + list(uni)[2:3] + [slug] + [seat])
 
     # Write the chart
     room = [s for s in csv.reader(open(LAYOUT), delimiter="\t")]
