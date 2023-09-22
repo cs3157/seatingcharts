@@ -7,6 +7,7 @@ import sys
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import argparse
 
 """
 expects a csv file with assignments of the form:
@@ -15,20 +16,44 @@ uni,name,seat
 name is ignored. Email is sent to uni@columbia.edu.
 """
 
-#ADDRESS used as the reply-to address
-ADDRESS = "cucs4118-tas@googlegroups.com"
+# Creates a CLI argument parser
+parser = argparse.ArgumentParser()
+
+parser.add_argument("filename",
+                    type=str,
+                    help="filename of the seating chart",
+                    metavar='<filename>')
+
+parser.add_argument("address",
+                    type=str,
+                    help="used as the reply-to address",
+                    metavar='<address>')
+
+parser.add_argument("subj",
+                    type=str,
+                    help="the message template subject name",
+                    metavar="<subj>")
+
+parser.add_argument("fromname",
+                    type=str,
+                    help="the name of the sender",
+                    metavar="<fromname>")
+
+parser.add_argument("fromaddr",
+                    type=str,
+                    help="the email address of the sender",
+                    metavar="<fromaddr>")
+
+args = parser.parse_args()
 
 #the message template, takes one variable which is replaced with the seat number
-subj = "OS Exam 1"
 msg = "You are assigned seat %s."
 
-if len(sys.argv) < 2:
-    print("USAGE: %s <assignment_csv_filename>" % sys.argv[0])
-    sys.exit(1)
+filename = args.filename
 
-filename = sys.argv[1]
+file = open(filename)
 
-students = csv.reader(open(filename))
+students = csv.reader(file)
 
 fromaddr = "kxc2103@columbia.edu"
 fromname = "Kevin Chen"
@@ -47,13 +72,13 @@ next_backoff = DEFAULT_BACKOFF
 for uni, toname, seat in students:
     print(uni, msg % seat)
 
-    toaddr = "%s@columbia.edu" % uni
+    toaddr = f"{uni}@columbia.edu"
 
     email = MIMEMultipart()
-    email["From"] = "\"%s\" <%s>" % (fromname, fromaddr)
-    email["To"] = "\"%s\" <%s>" % (toname, toaddr)
-    email["Subject"] = subj
-    email["Reply-To"] = ADDRESS
+    email["From"] = f"\{args.fromname}\{args.fromaddr}"
+    email["To"] = f"\{toname}\{toaddr}"
+    email["Subject"] = args.subj
+    email["Reply-To"] = args.address
 
     body = msg % seat
     email.attach(MIMEText(body, "plain"))
@@ -70,9 +95,11 @@ for uni, toname, seat in students:
             break
         except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
             print(f"{e.smtp_code}: {e.smtp_error.decode()}")
-            print("Waiting %s seconds" % next_backoff)
+            print(f"Waiting {next_backoff} seconds")
             time.sleep(next_backoff)
             next_backoff *= 2
             server = None
+
+file.close()
 
 server.quit()
