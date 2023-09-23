@@ -59,7 +59,7 @@ students = csv.reader(file)
 def setup_server():
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
-    server.login(fromaddr, os.environ["LIONMAIL_DEVICE_PASS"])
+    server.login(args.from_addr, os.environ["LIONMAIL_DEVICE_PASS"])
     return server
 
 server = None
@@ -87,7 +87,7 @@ for uni, to_name, seat in students:
         try:
             if server == None:
                 server = setup_server()
-            server.sendmail(fromaddr, toaddr, text)
+            server.sendmail(args.from_addr, to_addr, text)
             time.sleep(1)
             next_backoff = DEFAULT_BACKOFF
             break
