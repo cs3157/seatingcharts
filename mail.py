@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import csv
 import os
 import smtplib
@@ -7,7 +8,7 @@ import sys
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import argparse
+
 
 """
 expects a csv file with assignments of the form:
@@ -24,25 +25,25 @@ parser.add_argument("filename",
                     help="filename of the seating chart",
                     metavar='<filename>')
 
-parser.add_argument("address",
+parser.add_argument("reply_to",
                     type=str,
                     help="used as the reply-to address",
-                    metavar='<address>')
+                    metavar='<reply-to>')
 
-parser.add_argument("subj",
+parser.add_argument("subject",
                     type=str,
                     help="the message template subject name",
-                    metavar="<subj>")
+                    metavar="<subject>")
 
-parser.add_argument("fromname",
+parser.add_argument("from_name",
                     type=str,
                     help="the name of the sender",
-                    metavar="<fromname>")
+                    metavar="<from-name>")
 
-parser.add_argument("fromaddr",
+parser.add_argument("from_addr",
                     type=str,
                     help="the email address of the sender",
-                    metavar="<fromaddr>")
+                    metavar="<from-addr>")
 
 args = parser.parse_args()
 
@@ -69,16 +70,16 @@ server = None
 DEFAULT_BACKOFF = 30 # seconds
 next_backoff = DEFAULT_BACKOFF
 
-for uni, toname, seat in students:
+for uni, to_name, seat in students:
     print(uni, msg % seat)
 
-    toaddr = f"{uni}@columbia.edu"
+    to_addr = f"{uni}@columbia.edu"
 
     email = MIMEMultipart()
-    email["From"] = f"\{args.fromname}\{args.fromaddr}"
-    email["To"] = f"\{toname}\{toaddr}"
-    email["Subject"] = args.subj
-    email["Reply-To"] = args.address
+    email["From"] = f"\"{args.from_name}\" <{args.from_addr}>"
+    email["To"] = f"\"{to_name}\" <{to_addr}>"
+    email["Subject"] = args.subject
+    email["Reply-To"] = args.reply_to
 
     body = msg % seat
     email.attach(MIMEText(body, "plain"))
