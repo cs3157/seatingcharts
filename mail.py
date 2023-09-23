@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import csv
 import os
 import smtplib
@@ -8,6 +9,7 @@ import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+
 """
 expects a csv file with assignments of the form:
 uni,name,seat
@@ -15,28 +17,49 @@ uni,name,seat
 name is ignored. Email is sent to uni@columbia.edu.
 """
 
-#ADDRESS used as the reply-to address
-ADDRESS = "cucs4118-tas@googlegroups.com"
+# Creates a CLI argument parser
+parser = argparse.ArgumentParser()
+
+parser.add_argument("filename",
+                    type=str,
+                    help="filename of the seating chart",
+                    metavar='<filename>')
+
+parser.add_argument("reply_to",
+                    type=str,
+                    help="used as the reply-to address",
+                    metavar='<reply-to>')
+
+parser.add_argument("subject",
+                    type=str,
+                    help="the message template subject name",
+                    metavar="<subject>")
+
+parser.add_argument("from_name",
+                    type=str,
+                    help="the name of the sender",
+                    metavar="<from-name>")
+
+parser.add_argument("from_addr",
+                    type=str,
+                    help="the email address of the sender",
+                    metavar="<from-addr>")
+
+args = parser.parse_args()
 
 #the message template, takes one variable which is replaced with the seat number
-subj = "OS Exam 1"
 msg = "You are assigned seat %s."
 
-if len(sys.argv) < 2:
-    print("USAGE: %s <assignment_csv_filename>" % sys.argv[0])
-    sys.exit(1)
+filename = args.filename
 
-filename = sys.argv[1]
+file = open(filename)
 
-students = csv.reader(open(filename))
-
-fromaddr = "kxc2103@columbia.edu"
-fromname = "Kevin Chen"
+students = csv.reader(file)
 
 def setup_server():
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
-    server.login(fromaddr, os.environ["LIONMAIL_DEVICE_PASS"])
+    server.login(args.from_addr, os.environ["LIONMAIL_DEVICE_PASS"])
     return server
 
 server = None
@@ -44,16 +67,16 @@ server = None
 DEFAULT_BACKOFF = 30 # seconds
 next_backoff = DEFAULT_BACKOFF
 
-for uni, toname, seat in students:
+for uni, to_name, seat in students:
     print(uni, msg % seat)
 
-    toaddr = "%s@columbia.edu" % uni
+    to_addr = f"{uni}@columbia.edu"
 
     email = MIMEMultipart()
-    email["From"] = "\"%s\" <%s>" % (fromname, fromaddr)
-    email["To"] = "\"%s\" <%s>" % (toname, toaddr)
-    email["Subject"] = subj
-    email["Reply-To"] = ADDRESS
+    email["From"] = f"\"{args.from_name}\" <{args.from_addr}>"
+    email["To"] = f"\"{to_name}\" <{to_addr}>"
+    email["Subject"] = args.subject
+    email["Reply-To"] = args.reply_to
 
     body = msg % seat
     email.attach(MIMEText(body, "plain"))
@@ -64,15 +87,17 @@ for uni, toname, seat in students:
         try:
             if server == None:
                 server = setup_server()
-            server.sendmail(fromaddr, toaddr, text)
+            server.sendmail(args.from_addr, to_addr, text)
             time.sleep(1)
             next_backoff = DEFAULT_BACKOFF
             break
         except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
             print(f"{e.smtp_code}: {e.smtp_error.decode()}")
-            print("Waiting %s seconds" % next_backoff)
+            print(f"Waiting {next_backoff} seconds")
             time.sleep(next_backoff)
             next_backoff *= 2
             server = None
+
+file.close()
 
 server.quit()
