@@ -56,9 +56,6 @@ file = open(filename)
 
 students = csv.reader(file)
 
-fromaddr = "kxc2103@columbia.edu"
-fromname = "Kevin Chen"
-
 def setup_server():
     server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
