@@ -1,72 +1,9 @@
 										A7		A3			A2		A6		A10		A14						
-				B19		B15		B11		B7		B3			B2		B6		B10		B14		B18				
-				C19		C15		C11		C7		C3			C2		C6		C10		C14		C18				
-				D19		D15		D11		D7		D3			D2		D6		D10		D14		D18				
-
-E7		E3			E2		E6
-F7		F3			F2		F6
-G7		G3			G2		G6
-H7		H3			H2		H6
-J3							J2
-
-				
-		E23		E19
-F27		F23		F19
-		G23		G19
-				H19
-
-				
-E18		E22		
-F18		F22		F26
-G18		G22		
-H18				
-
-	E15		E11	
-	F15		F11	
-	G15		G11	
-	H15		H11	
-	J11		J7	
-
-	E10		E14	
-	F10		F14	
-	G10		G14	
-	H10		H14	
-	J6		J10	
-
-											A5		A1			A4		A8		A12							
-					B17		B13		B9		B5					B4		B8		B12		B16					
-			C21		C17		C13		C9		C5					C4		C8		C12		C16		C20			
-			D21		D17		D13		D9		D5					D4		D8		D12		D16		D20			
-
-E9		E5					E4		E8
-F9		F5					F4		F8
-G9		G5					G4		G8
-H9		H5					H4		H8
-J5									J4
-
-			
-	E25		E21
-	F25		F21
-	G25		G21
-			H21
-
-
-			
-E20		E24	
-F20		F24	
-G20		G24	
-H20			
-
-
-	E17		E13	
-	F17		F13	
-	G17		G13	
-	H17		H13	
-			J9	
-
-
-	E12		E16	
-	F12		F16	
-	G12		G16	
-	H12		H16	
-	J8			
+				B19		B15		B11		B7		B3			B2		B6		B10		B14		B18		
+				C19		C15		C11		C7		C3			C2		C6		C10		C14		C18		C22		
+				D19		D15		D11		D7		D3			D2		D6		D10		D14		D18     D22		
+		E25		E21 	E17 	E13 	E9 		E5			E2 		E6 		E10 	E14 	E18 	E22 	E26
+		F25 	F21 	F17 	F13 	F9 		F5 			F2 		F6 		F10 	F14 	F18 	F22  	F26
+		G25		G21 	G17 	G13 	G9 		G5			G2 		G6 		G10 	G14 	G18 	G22 	G26
+				H19		H15		H11		H7		H3			H2		H6		H10		H14		H18     H22
+								J11      J7 	J3			J2 		J6 		J10
