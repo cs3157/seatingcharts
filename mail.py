@@ -9,7 +9,6 @@ import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-
 """
 expects a csv file with assignments of the form:
 uni,name,seat
@@ -25,25 +24,26 @@ parser.add_argument("filename",
                     help="filename of the seating chart",
                     metavar='<filename>')
 
-parser.add_argument("reply_to",
+parser.add_argument("-a", "--from_addr",
                     type=str,
-                    help="used as the reply-to address",
-                    metavar='<reply-to>')
-
-parser.add_argument("subject",
-                    type=str,
-                    help="the message template subject name",
-                    metavar="<subject>")
-
-parser.add_argument("from_name",
-                    type=str,
-                    help="the name of the sender",
-                    metavar="<from-name>")
-
-parser.add_argument("from_addr",
-                    type=str,
+                    default="do.not.reply@cloud.cs.columbia.edu",
                     help="the email address of the sender",
                     metavar="<from-addr>")
+
+parser.add_argument("-s", "--subject",
+        type=str,
+        default='',
+        help='subject line for the emails sent, default is no subject')
+
+parser.add_argument("-n", "--sender",
+        type=str,
+        default='3157 Teaching Staff',
+        help='sender name for emails, default="3157 Teaching Staff"')
+
+parser.add_argument("-r", "--reply_to",
+        type=str,
+        default='cucs3157-tas@googlegroups.com',
+        help='reply-to email address, default="cucs3157-tas@googlegroups.com"')
 
 args = parser.parse_args()
 
@@ -74,7 +74,7 @@ for uni, to_name, seat in students:
     recipients = [to_columbia, to_barnard]
 
     email = MIMEMultipart()
-    email["From"] = f"\"{args.from_name}\" <do.not.reply@cloud.cs.columbia.edu>"
+    email["From"] = f"\"{args.sender}\" <args.from_addr>"
     email["To"] = ", ".join(recipients)
     email["Subject"] = args.subject
     email["Reply-To"] = args.reply_to
