@@ -57,9 +57,8 @@ file = open(filename)
 students = csv.reader(file)
 
 def setup_server():
-    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server = smtplib.SMTP("smtp-relay.gmail.com", 587)
     server.starttls()
-    server.login(args.from_addr, os.environ["LIONMAIL_DEVICE_PASS"])
     return server
 
 server = None
@@ -70,11 +69,13 @@ next_backoff = DEFAULT_BACKOFF
 for uni, to_name, seat in students:
     print(uni, msg % seat)
 
-    to_addr = f"{uni}@columbia.edu"
+    to_columbia = f"{uni}@columbia.edu"
+    to_barnard = f"{uni}@barnard.edu"
+    recipients = [to_columbia, to_barnard]
 
     email = MIMEMultipart()
-    email["From"] = f"\"{args.from_name}\" <{args.from_addr}>"
-    email["To"] = f"\"{to_name}\" <{to_addr}>"
+    email["From"] = f"\"{args.from_name}\" <do.not.reply@cloud.cs.columbia.edu>"
+    email["To"] = ", ".join(recipients)
     email["Subject"] = args.subject
     email["Reply-To"] = args.reply_to
 
@@ -87,7 +88,7 @@ for uni, to_name, seat in students:
         try:
             if server == None:
                 server = setup_server()
-            server.sendmail(args.from_addr, to_addr, text)
+            server.sendmail(args.from_addr, recipients, text)
             time.sleep(1)
             next_backoff = DEFAULT_BACKOFF
             break
