@@ -20,15 +20,14 @@ name is ignored. Email is sent to uni@columbia.edu.
 parser = argparse.ArgumentParser()
 
 parser.add_argument("filename",
-                    type=str,
-                    help="filename of the seating chart",
-                    metavar='<filename>')
+        type=str,
+        help="filename of the seating chart",
+        metavar='<filename>')
 
 parser.add_argument("-a", "--from_addr",
-                    type=str,
-                    default="do.not.reply@cloud.cs.columbia.edu",
-                    help="the email address of the sender",
-                    metavar="<from-addr>")
+        type=str,
+        default="do.not.reply@cloud.cs.columbia.edu",
+        help="the email address of the sender",)
 
 parser.add_argument("-s", "--subject",
         type=str,
@@ -74,7 +73,7 @@ for uni, to_name, seat in students:
     recipients = [to_columbia, to_barnard]
 
     email = MIMEMultipart()
-    email["From"] = f"\"{args.sender}\" <args.from_addr>"
+    email["From"] = f"\"{args.sender}\" <{args.from_addr}>"
     email["To"] = ", ".join(recipients)
     email["Subject"] = args.subject
     email["Reply-To"] = args.reply_to
