@@ -84,7 +84,7 @@ def main():
                     students.remove(student)
             csvfile.flush()
 
-        os.system(["./seatingchart.py", rname, rname])
+        os.system(f"./seatingchart.py {rname} {rname}")
         shutil.copy(path / f"chart_{rname}.html", HTML_PATH / f"{rname}.html")
 
         with (path / f"list_{rname}.csv").open('r') as list_file:
