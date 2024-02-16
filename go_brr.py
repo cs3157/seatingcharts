@@ -5,89 +5,106 @@ import csv
 import glob
 import os
 import random
+import shutil
 import sys
 import math
+from pathlib import Path
 from csv2pdf import convert
 
-OUT_PATH = "out"
-HTML_PATH = "~/html/seating"
+OUT_PATH = Path.cwd() / "out"
+HTML_PATH = Path.home() / "html" / "seating"
 
-parser = argparse.ArgumentParser(
-    description="Go brrr with the seating charts")
-
-parser.add_argument("rooms",
-                    type=str,
-                    metavar='<rooms>')
-
-parser.add_argument("roster",
-                    type=str,
-                    metavar='<roster>')
+def rename_images(img_path: Path) -> None:
+    for img in img_path.glob("*"):
+        if img.suffix == ".jpeg":
+            img.rename(img.with_suffix('.jpg'))
 
 
-args = parser.parse_args()
-ROOMS_IN_ORDER = args.rooms
-STUDENT_LIST = args.roster
+def create_html_directory(html_path: Path) -> None:
+    # Remove the directory if it exists
+    if html_path.exists():
+        shutil.rmtree(HTML_PATH)
 
-#students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))][3:]
-students = [tuple(s) for s in csv.reader(open(STUDENT_LIST))]
-random.shuffle(students)
-student_count = len(students)
-seat_count = 0
-for img in glob.glob("images/*"):
-    if img.split('.')[1] == "jpeg":
-        os.rename(img, img.split('.')[0]+'.jpg')
+    # Create the directory
+    html_path.mkdir(parents=True, exist_ok=True)
+    html_path.chmod(0o755)
 
-os.system(f"rm -r {HTML_PATH}")
-os.system("mkdir -p %s" %HTML_PATH)
-os.system("touch %s/seat.csv" %HTML_PATH)
-os.system("chmod 744 %s/seat.csv" %HTML_PATH)
-os.system("echo %s >>  %s/seat.csv" %("Uni, Name, Room, Seat", HTML_PATH))
-os.system("chmod 755 %s" %HTML_PATH)
 
-with open(ROOMS_IN_ORDER, 'r') as f:
-    rooms = f.readlines()
-rooms = [r for r in rooms if r != '\n']
-rooms = list([z.strip().split() for z in rooms])
-print(f"rooms:{rooms}")
-for _, count in rooms:
-    seat_count += int(count)
-print(f"Total seats:{seat_count}")
+def init_seat_csv(seat_csv_path: Path) -> None:
+    seat_csv_path.write_text("Uni, Name, Room, Seat\n")
+    seat_csv_path.chmod(0o744)
 
-for room in rooms:
-    rname = room[0]
-    path = os.path.join(OUT_PATH, rname)
-    os.system("rm -rf %s" % path)
-    os.mkdir(path)
-    os.system(("ln -s %s %s" %
-           ("images", path + "/" + "images")))
-    # print(("cp %s %s" %
-    #        ("images", path + "/" + "images")))
-    # os.system(("cp -rf %s %s" %
-    #            ("images", path + "/" + "images")))
-    csvfile = open(os.path.join(path, "roster_" + rname + ".csv"), "w")
-    output = csv.writer(csvfile)
-    output.writerow("")
-    output.writerow("")
-    for i in range(math.ceil(student_count / seat_count * int(room[1]))):
-#    for i in range(int(room[1])):
-        if(len(students) > 0):
-            student = random.choice(students)
-            output.writerow(student)
-            students.remove(student)
-    csvfile.flush()
-    os.system("./seatingchart.py %s %s" %
-              (rname, rname))
-    os.system("cp %s/%s/chart_%s.html %s/%s.html" %
-              (OUT_PATH, rname, rname, HTML_PATH, rname))
-    os.system(f"perl -F, -lane 's/$F[2]/$F[2], {rname}/; print' {OUT_PATH}/{rname}/list_{rname}.csv >> {HTML_PATH}/seat.csv")
-#    os.system("cp %s/%s/list_%s.csv %s/%s.csv" %
-#              (OUT_PATH, rname, rname, HTML_PATH, rname))
-    os.system("chmod 644 %s/%s.html" % (HTML_PATH, rname))
-os.system("cp -r images %s/images" %HTML_PATH)
-os.system("chmod 711 %s/images" %HTML_PATH)
-os.system("chmod 644 %s/images/*.*" %HTML_PATH)
-convert(f"/home/zz2474/html/seating/seat.csv", f"/home/zz2474/html/seating/seat.pdf")
-os.system("chmod 644 /home/zz2474/html/seating/seat.pdf")
-os.system("rm /home/zz2474/html/seating/seat.csv")
 
-print("\033[01;92mSuccess!")
+def main():
+    parser = argparse.ArgumentParser(description="Go brrr with the seating charts")
+    parser.add_argument("rooms", type=str, metavar='<rooms>')
+    parser.add_argument("roster", type=str, metavar='<roster>')
+    args = parser.parse_args()
+
+    ROOMS_IN_ORDER = Path(args.rooms)
+    STUDENT_LIST = Path(args.roster)
+
+    with STUDENT_LIST.open() as f:
+        students = [tuple(s) for s in csv.reader(f)]
+
+    random.shuffle(students)
+    student_count = len(students)
+    seat_count = 0
+
+    rename_images(Path("images"))
+
+    create_html_directory(HTML_PATH)
+
+    # Create the file
+    seat_csv_path = HTML_PATH / "seat.csv"
+    init_seat_csv(seat_csv_path)
+
+    with ROOMS_IN_ORDER.open('r') as f:
+        rooms = [r.strip().split() for r in f.readlines() if r.strip()]
+
+    print(f"rooms:{rooms}")
+    for _, count in rooms:
+        seat_count += int(count)
+    print(f"Total seats:{seat_count}")
+
+    for room in rooms:
+        rname = room[0]
+        path = Path(OUT_PATH) / rname
+        shutil.rmtree(path, ignore_errors=True)
+        path.mkdir(parents=True)
+        (path / "images").symlink_to(Path("images"))
+
+        with (path / f"roster_{rname}.csv").open("w", newline='') as csvfile:
+            output = csv.writer(csvfile)
+            output.writerow([""] * 2)
+            for _ in range(math.ceil(student_count / seat_count * int(room[1]))):
+                if students:
+                    student = random.choice(students)
+                    output.writerow(student)
+                    students.remove(student)
+            csvfile.flush()
+
+        os.system(["./seatingchart.py", rname, rname])
+        shutil.copy(path / f"chart_{rname}.html", HTML_PATH / f"{rname}.html")
+
+        with (path / f"list_{rname}.csv").open('r') as list_file:
+            with seat_csv_path.open('a') as seat_file:
+                for line in list_file:
+                    modified_line = line.replace(f"{room[0]},", f"{room[0]}, {rname},")
+                    seat_file.write(modified_line)
+
+        (HTML_PATH / f"{rname}.html").chmod(0o644)
+
+    shutil.copytree("images", HTML_PATH / "images")
+    (HTML_PATH / "images").chmod(0o711)
+    for img in (HTML_PATH / "images").glob("*.*"):
+        img.chmod(0o644)
+
+    convert(seat_csv_path, HTML_PATH / "seat.pdf")
+    (HTML_PATH / "seat.pdf").chmod(0o644)
+    seat_csv_path.unlink()
+
+    print("\033[01;92mSuccess!\033[0m")
+
+if __name__ == "__main__":
+    main()
