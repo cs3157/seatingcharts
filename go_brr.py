@@ -2,101 +2,131 @@
 
 import argparse
 import csv
-import csv2pdf
-import glob
 import math
 import os
 import random
 import rosters
-import sys
+import shutil
+from pathlib import Path
 
-OUT_PATH = "out"
-HTML_PATH = os.path.expanduser("~/html/seating")
+import csv2pdf
 
-GREEN = "\033[0;32m"
+OUT_PATH = Path.cwd() / "out"
+HTML_PATH = Path.home() / "html" / "seating"
+HTML_IMAGES_PATH = HTML_PATH / "images"
+HTML_PDF_PATH = HTML_PATH / "seat.pdf"
+
+# ANSI color codes
+GREEN = "\033[01;92m"
+RED = "\033[01;91m"
 END = "\033[0m"
 
-def run(rooms, students):
-    student_count = len(students)
+def rename_images(img_path: Path) -> None:
+    for img in img_path.glob("*"):
+        if img.suffix == ".jpeg":
+            img.rename(img.with_suffix('.jpg'))
+
+
+def create_html_directory(html_path: Path) -> None:
+    # Remove the directory if it exists
+    if html_path.exists():
+        shutil.rmtree(HTML_PATH)
+
+    # Create the directory
+    html_path.mkdir(parents=True, exist_ok=True)
+    html_path.chmod(0o755)
+
+
+def init_seat_csv(seat_csv_path: Path) -> None:
+    seat_csv_path.write_text("Uni,Name,Seat,Room\n")
+    seat_csv_path.chmod(0o744)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Go brrr with the seating charts")
+    parser.add_argument("rooms", type=str, metavar='<rooms_file>')
+    parser.add_argument("roster", type=str, metavar='<roster_file>')
+    args = parser.parse_args()
+
+    ROOM_FILE = Path(args.rooms)
+
+    students = rosters.load_roster(args.roster)  
+    print(f"Found {len(students)} students in the roster file")
 
     random.shuffle(students)
+    student_count = len(students)
     seat_count = 0
-    for img in glob.glob("images/*"):
-        if img.split('.')[1] == "jpeg":
-            os.rename(img, img.split('.')[0]+'.jpg')
 
-    print(f"Preparing HTML directory '{HTML_PATH}'...")
-    os.system(f"rm -r {HTML_PATH}")
-    os.system(f"mkdir -p {HTML_PATH}")
-    os.system(f"touch {HTML_PATH}/seat.csv")
-    os.system(f"chmod 744 {HTML_PATH}/seat.csv")
-    os.system(f"echo Uni, Name, Room, Seat >>  {HTML_PATH}/seat.csv")
-    os.system(f"chmod 755 {HTML_PATH}")
+    rename_images(Path("images"))
 
-    for _, count in rooms:
+    create_html_directory(HTML_PATH)
+
+    # Create the file
+    seat_csv_path = HTML_PATH / "seat.csv"
+    init_seat_csv(seat_csv_path)
+
+    with ROOM_FILE.open('r') as f:
+        rooms = [r.strip().split() for r in f.readlines() if r.strip()]
+
+    print("Rooms:")
+
+    for room_name, count in rooms:
+        print(f"- {room_name}: {count} seats")
         seat_count += int(count)
-    print("Total seats:", seat_count)
+    print(f"Total seats: {seat_count}")
+
+    student_index = 0
 
     for room in rooms:
-        rname = room[0]
-        path = os.path.join(OUT_PATH, rname)
-        os.system(f"rm -rf {path}")
-        os.mkdir(path)
+        rname, rcount = room[0], room[1]
+        ROOM_OUT_PATH = Path(OUT_PATH) / rname
+        ROOM_ROSTER_PATH = ROOM_OUT_PATH / f"roster_{rname}.csv"
+        ROOM_LIST_PATH = ROOM_OUT_PATH / f"list_{rname}.csv"
+        ROOM_CHART_PATH = ROOM_OUT_PATH / f"chart_{rname}.html"
+        ROOM_IMAGES_PATH = ROOM_OUT_PATH / "images"
 
-        with open(os.path.join(path, "roster_" + rname + ".csv"), "w") as csvfile:
+        HTML_ROOM_PATH = HTML_PATH / f"{rname}.html"
+
+        shutil.rmtree(ROOM_OUT_PATH, ignore_errors=True)
+        ROOM_OUT_PATH.mkdir(parents=True)
+        ROOM_IMAGES_PATH.symlink_to(Path("images"))
+
+        with ROOM_ROSTER_PATH.open("w", newline='') as csvfile:
             output = csv.writer(csvfile)
-            for i in range(math.ceil(student_count / seat_count * int(room[1]))):
-                if len(students) > 0:
-                    student = random.choice(students)
+            num_seats = math.ceil(student_count / seat_count * int(rcount))
+            for _ in range(num_seats):
+                if student_index < student_count:
+                    student = students[student_index]
+                    student_index += 1
                     output.writerow(student)
-                    students.remove(student)
+            csvfile.flush()
 
-        os.system("./seatingchart.py %s %s" %
-                (rname, rname))
-        os.system("cp %s/%s/chart_%s.html %s/%s.html" %
-                (OUT_PATH, rname, rname, HTML_PATH, rname))
+        # Check if the os.system call is successful
+        if os.system(f"./seatingchart.py {rname} {rname}") != 0:
+            print(RED+"Error: seatingchart.py failed"+END)
+            return
 
-        # TODO Figure out what the hell this is doing
-        os.system(f"perl -F, -lane 's/$F[2]/$F[2], {rname}/; print' {OUT_PATH}/{rname}/list_{rname}.csv >> {HTML_PATH}/seat.csv")
-    
-        os.system(f"chmod 644 {HTML_PATH}/{rname}.html")
-    
-    print("Copying images to HTML directory...")
-    os.system(f"cp -r images {HTML_PATH}/images")
-    os.system(f"chmod 711 {HTML_PATH}/images")
-    os.system(f"chmod 644 {HTML_PATH}/images/*.*")
+        shutil.copy(ROOM_CHART_PATH, HTML_ROOM_PATH)
 
-    csv2pdf.convert(f"{HTML_PATH}/seat.csv", f"{HTML_PATH}/seat.pdf")
-    os.system(f"chmod 644 {HTML_PATH}/seat.pdf")
-    os.system(f"rm {HTML_PATH}/seat.csv")
+        with ROOM_LIST_PATH.open('r') as list_file:
+            with seat_csv_path.open('a') as seat_file:
+                for line in list_file:
+                    modified_line = line.strip() + f",{rname}\n"
+                    seat_file.write(modified_line)
+
+        HTML_ROOM_PATH.chmod(0o644)
+
+    shutil.copytree("images", HTML_IMAGES_PATH)
+    HTML_IMAGES_PATH.chmod(0o711)
+    for img in HTML_IMAGES_PATH.glob("*.*"):
+        img.chmod(0o644)
+
+    csv2pdf.convert(seat_csv_path, HTML_PDF_PATH)
+    HTML_PDF_PATH.chmod(0o644)
+    seat_csv_path.unlink()
 
     print(GREEN+"Success!"+END)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Go brrr with the seating charts")
-
-    parser.add_argument("rooms",
-                        type=str,
-                        metavar='<rooms_file>')
-
-    parser.add_argument("roster",
-                        type=str,
-                        metavar='<roster_file>')
-
-
-    args = parser.parse_args()
-
-    students = rosters.load_roster(args.roster)
-    print(f"Loaded {len(students)} students from {args.roster}")
-
-    rooms = open(args.rooms, "r", newline='').readlines()
-    rooms = map(str.strip, rooms) # remove leading/trailing whitespace
-    rooms = filter(None, rooms) # remove empty strings
-    rooms = map(lambda r: r.split(' '), rooms) # split on space to separate room from seat count
-    rooms = list(rooms)
-
-    print(f"Loaded {len(rooms)} rooms from {args.rooms}")
-
-    run(rooms, students)
+    main()
 

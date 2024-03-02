@@ -9,7 +9,6 @@ import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-
 """
 expects a csv file with assignments of the form:
 uni,name,seat
@@ -21,29 +20,29 @@ name is ignored. Email is sent to uni@columbia.edu.
 parser = argparse.ArgumentParser()
 
 parser.add_argument("filename",
-                    type=str,
-                    help="filename of the seating chart",
-                    metavar='<filename>')
+        type=str,
+        help="filename of the seating chart",
+        metavar='<filename>')
 
-parser.add_argument("reply_to",
-                    type=str,
-                    help="used as the reply-to address",
-                    metavar='<reply-to>')
+parser.add_argument("-a", "--from_addr",
+        type=str,
+        default="do.not.reply@cloud.cs.columbia.edu",
+        help="the email address of the sender",)
 
-parser.add_argument("subject",
-                    type=str,
-                    help="the message template subject name",
-                    metavar="<subject>")
+parser.add_argument("-s", "--subject",
+        type=str,
+        default='',
+        help='subject line for the emails sent, default is no subject')
 
-parser.add_argument("from_name",
-                    type=str,
-                    help="the name of the sender",
-                    metavar="<from-name>")
+parser.add_argument("-n", "--sender",
+        type=str,
+        default='3157 Teaching Staff',
+        help='sender name for emails, default="3157 Teaching Staff"')
 
-parser.add_argument("from_addr",
-                    type=str,
-                    help="the email address of the sender",
-                    metavar="<from-addr>")
+parser.add_argument("-r", "--reply_to",
+        type=str,
+        default='cucs3157-tas@googlegroups.com',
+        help='reply-to email address, default="cucs3157-tas@googlegroups.com"')
 
 args = parser.parse_args()
 
@@ -57,9 +56,8 @@ file = open(filename)
 students = csv.reader(file)
 
 def setup_server():
-    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server = smtplib.SMTP("smtp-relay.gmail.com", 587)
     server.starttls()
-    server.login(args.from_addr, os.environ["LIONMAIL_DEVICE_PASS"])
     return server
 
 server = None
@@ -70,11 +68,13 @@ next_backoff = DEFAULT_BACKOFF
 for uni, to_name, seat in students:
     print(uni, msg % seat)
 
-    to_addr = f"{uni}@columbia.edu"
+    to_columbia = f"{uni}@columbia.edu"
+    to_barnard = f"{uni}@barnard.edu"
+    recipients = [to_columbia, to_barnard]
 
     email = MIMEMultipart()
-    email["From"] = f"\"{args.from_name}\" <{args.from_addr}>"
-    email["To"] = f"\"{to_name}\" <{to_addr}>"
+    email["From"] = f"\"{args.sender}\" <{args.from_addr}>"
+    email["To"] = ", ".join(recipients)
     email["Subject"] = args.subject
     email["Reply-To"] = args.reply_to
 
@@ -87,7 +87,7 @@ for uni, to_name, seat in students:
         try:
             if server == None:
                 server = setup_server()
-            server.sendmail(args.from_addr, to_addr, text)
+            server.sendmail(args.from_addr, recipients, text)
             time.sleep(1)
             next_backoff = DEFAULT_BACKOFF
             break
