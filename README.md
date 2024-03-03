@@ -17,11 +17,32 @@ A collection of scripts to produce a randomized set of seating assignments.
 
 2. Download the student images from the 'Photo Roster' tab. This can be achieved either with a browser extension, by using the "Save page as" functionality, or running the `imagedl.py` script.
 
-3. If necessary, edit the `rooms` file.
+3. If necessary, edit the `rooms` file (see 'Room format' below)
 
 4. Run `./go_brr.py rooms roster_filename.csv`
 
 5. Profit! The output can be found in `out/` and will also be placed in `~/html/seating/`
+
+## Room format ##
+
+### rooms file ###
+This is the file passed to `go_brr.py`. It follows the following format
+```
+room1name room1seatcount
+room2name room2seatcount
+...
+```
+For each room, the `layouts` directory must contain two additional files:
+1. The visual layout file, `room1name.txt`
+This file determines the general layout of a room as it will be reflected on the HTML seating chart. Seats must be separated by a TAB character
+```
+SEAT1	SEAT2	SEAT3		SEAT4	SEAT5	SEAT6
+SEAT7	SEAT8	SEAT9		SEAT10	SEAT11	SEAT12
+...
+```
+
+2. The fill order file, `room1name_ordered.txt`
+This file determines in what order to fill seats. Exact semantics don't matter much (i.e. spaces, tabs and line breaks are functionally identical) though lines starting with hash (#) symbols will be ignored.
 
 ## Additional features (not yet available with go_brr.py) ##
 *   Lefty roster
