@@ -8,6 +8,7 @@ import argparse
 import csv
 import itertools
 import random
+import rosters
 from pathlib import Path
 
 def assert_file_exists(path):
@@ -89,8 +90,7 @@ def main(args):
     with open(ASSIGN_FIRST, "r") as f:
         assign_first = [x.strip() for x in f.readlines()]
 
-    with open(STUDENT_LIST, "r") as f:
-        students = [tuple(s) for s in csv.reader(f)]
+    students = rosters.load_roster(STUDENT_LIST)
 
     random.shuffle(students)
 
@@ -125,7 +125,7 @@ def main(args):
         lseats = [s for s in lseats if s[0] != "#"]
         lseats = list(itertools.chain.from_iterable([z.strip().split() for z in lseats]))
 
-        lstudents = [tuple(s) for s in csv.reader(open(LSTUDENT_LIST))][2:]
+        lstudents = rosters.load_roster(LSTUDENT_LIST)
         random.shuffle(lstudents)
 
         for lseat in lseats:
@@ -162,16 +162,15 @@ def main(args):
         <body>
         <h3>%s</h3>
         <div class="assignments">\n\n""" % TITLE)
-        for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):  # sort by uni
-            html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
-                    % (student[2], seat))
-        html.write("""</div></body>\n""")
+        for seat, student in sorted(assignments.items(), key=lambda x: x[1][0]):  # sort by uni
+            html.write(f'<div><span class="uni">{student[0]}</span> <span class="seat">{seat}</span></div>')
+        html.write('</div></body>\n')
 
     # dump to CSV as well
     with open(OUTPUT_CSV, "w") as output:
         csv_output = csv.writer(output)
-        for seat, uni in assignments.items():
-            csv_output.writerow(list(uni)[:2] + [seat])
+        for seat, student in assignments.items():
+            csv_output.writerow(list(student) + [seat])
 
     # Write the chart
     with open(LAYOUT) as layout:
@@ -232,14 +231,14 @@ def main(args):
 
                 try:
                     student = assignments[seat]
-                    uni = student[2]
-                    name = student[0]
-                    full_name = student[1].split(", ")
+                    uni = student[0]
+                    name = student[1]
+                    full_name = name.split(", ")
                     full_name = f"{full_name[1]} {full_name[0]}"
 
                     # Used to check if file exists
-                    img_path = photos_path / f"{name}.jpg"
-                    img_rel_path = photos_path / f"{name}.jpg"  # Inserted into HTML
+                    img_path = photos_path / f"{uni}.jpg"
+                    img_rel_path = photos_path / f"{uni}.jpg"  # Inserted into HTML
                     if img_path.is_file():
                         seating_chart.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
                                             % (seat, uni, name, img_rel_path))
@@ -284,7 +283,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--debug",
                         action="store_true",
                         help="print debug messages")
-    
+
     args = parser.parse_args()
 
     main(args)
