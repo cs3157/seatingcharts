@@ -23,6 +23,17 @@ GREEN = "\033[01;92m"
 RED = "\033[01;91m"
 END = "\033[0m"
 
+ASCII_ART = r"""
+ ________  ________          ________  ________  ________     
+|\   ____\|\   __  \        |\   __  \|\   __  \|\   __  \    
+\ \  \___|\ \  \|\  \       \ \  \|\ /\ \  \|\  \ \  \|\  \   
+ \ \  \  __\ \  \\\  \       \ \   __  \ \   _  _\ \   _  _\  
+  \ \  \|\  \ \  \\\  \       \ \  \|\  \ \  \\  \\ \  \\  \| 
+   \ \_______\ \_______\       \ \_______\ \__\\ _\\ \__\\ _\ 
+    \|_______|\|_______|        \|_______|\|__|\|__|\|__|\|__|
+                                                              
+"""
+
 def rename_images(img_path: Path) -> None:
     for img in img_path.glob("*"):
         if img.suffix == ".jpeg":
@@ -45,6 +56,8 @@ def init_seat_csv(seat_csv_path: Path) -> None:
 
 
 def main():
+    print(ASCII_ART)
+
     parser = argparse.ArgumentParser(description="Go brrr with the seating charts")
     parser.add_argument("rooms", type=str, metavar='<rooms_file>')
     parser.add_argument("roster", type=str, metavar='<roster_file>')
