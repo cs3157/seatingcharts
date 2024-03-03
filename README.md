@@ -1,67 +1,36 @@
-seatingcharts
-=============
+# seatingcharts #
 
-Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming.
-
-This python script takes a class roster, classroom layout, and some helper files to produce a random set of seating assignments. The best documentation may be comments in the script itself.
+A collection of scripts to produce a randomized set of seating assignments.
 
 
-Usage
------
-Update 10/2/2022:
-Thing's changed! We regularly get a huge class size (over 300 students.) So XXXurxo wrote a helper script to handle multiple rooms in one shot; here is how to use it:
+## Scripts ##
 
-1. Download the roster from the Grades tab of courseworks; save it as roster.csv, which contains three columns: Student ID, Student Name, and blank. NO HEADER!!!!! (see sample_roster.csv)
+* `seatingchart.py` - The core of this toolset. Creates seating assignments for a single room and produces HTML output. Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming.
+* `go_brr.py` - Splits a larger roster into sub-rosters, one per room, and calls `seatingchart.py` for each one. Written by XXXurxo.
+* `mail.py` - Sends individual seating assignments to students by email
+* `imagedl.py` - Downloads students' photos. Written by Carl.
+* `rosters.py` - Downloads the student roster from Canvas. It is also used by other scripts to parse roster csv files. Writen by Carl.
 
-2. Download all the images from the photo roster in coursworks by chrome extensions, and save them in the images folder
+## Usage ##
 
-3. modify the rooms file in this format: 
-	<p>[layout-1] [number of students]</p>
-	<p>[layout-2] [number of students]</p>
-	(see sample_room)
+1. Download the roster CSV file. This can either be done manually by going into the 'Grades' tab on Courseworks and selecting Export > Export Entire Gradebook or by using `rosters.py --download roster_filename.csv`
 
-4. run python3 go_brr.py rooms roster.csv
+2. Download the student images from the 'Photo Roster' tab. This can be achieved either with a browser extension, by using the "Save page as" functionality, or running the `imagedl.py` script.
+
+3. If necessary, edit the `rooms` file.
+
+4. Run `./go_brr.py rooms roster_filename.csv`
+
+5. Profit! The output can be found in `out/` and will also be placed in `~/html/seating/`
 
 You can find the output in the out folder :)
 
-### ### ### ### ### ### ### ### ### ### ### ### 
-### Downloading the input files
-
-For sample inputs, see the `out/demo/` directory.
-
-*   In the `out` directory, create a working directory for storing files related
-    to this exam.
-    -   Example: `3157-2017-9-001_final`
-    -   This string is the _slug_ for this exam.
-
-*   Log into [CourseWorks](https://courseworks2.columbia.edu/) using Chrome
-    or Firefox.
-
-*   Find your class site.
-
-*   Student roster
-    -   Go to Grades > Export > CSV File.
-    -   Move this file to the working directory.
-    -   Rename it `roster_<slug>.csv`.
-
-*   (Optional) Lefty roster
+## Additional features (not yet available with go_brr.py) ##
+*   Lefty roster
     -   Ensure that your classroom has a `<classroom>_lefty_ordered.txt` file.
     -   Move lefties from `roster_<slug>.csv` to a new file called
         `left_roster_<slug>.csv`. This file follows the same format as the normal roster.
     -   Run `seatingcharts.py` with the `-l` flag.
-
-*   Photo roster
-    -   Go to Photo Roster in the menu on the left and wait a minute.
-    -   On Chrome, use File > Save Page As. In the Format drop-down, select
-        "Web Page, complete".
-    -   On Firefox, right-click inside the Photo Roster panel and select
-        This Frame > Save Frame As. In the Format drop-down, select "Web Page,
-        complete".
-    -   Navigate to your working directory, name the file `<slug>.html`
-        and press Save.
-    -   You should now have an HTML page and a directory of files with all
-        students' photos, along with some miscellaneous JS files. You do not
-        need to delete the extra cruft.
 
 *   If you want to put some students in the front/back of the classroom, also
     create files named `assign-first_<slug>.txt` and `assign-last_<slug>.txt`.
@@ -73,7 +42,7 @@ For sample inputs, see the `out/demo/` directory.
         other reason to be absent.
 
 
-### Running the `seatingchart.py` script
+### Running the `seatingchart.py` script ###
 
 The usage of the command is as follows:
 
@@ -112,8 +81,7 @@ Once the script runs, it will output:
     `mail.py`.
 
 
-Emailing students their seating assignments
--------------------------------------------
+### Emailing students their seating assignments ###
 
 You can now use mail.py to send individual emails to students with their seat assignment.
 
@@ -123,8 +91,7 @@ You can now use mail.py to send individual emails to students with their seat as
 * Change the name and email in the script.
 
 
-Adding support for new classrooms
----------------------------------
+### Adding support for new classrooms ###
 
 In general, the script works by:
 
