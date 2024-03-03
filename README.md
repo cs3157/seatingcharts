@@ -13,7 +13,7 @@ A collection of scripts to produce a randomized set of seating assignments.
 
 ## Usage ##
 
-1. Download the roster CSV file. This can either be done manually by going into the 'Grades' tab on Courseworks and selecting Export > Export Entire Gradebook or by using `rosters.py --download roster_filename.csv`
+1. Download the roster CSV file. This can either be done manually by going into the 'Grades' tab on Courseworks and selecting Export > Export Entire Gradebook or by using `rosters.py --download roster_filename.csv` (this requires a Canvas API key)
 
 2. Download the student images from the 'Photo Roster' tab. This can be achieved either with a browser extension, by using the "Save page as" functionality, or running the `imagedl.py` script.
 
@@ -22,8 +22,6 @@ A collection of scripts to produce a randomized set of seating assignments.
 4. Run `./go_brr.py rooms roster_filename.csv`
 
 5. Profit! The output can be found in `out/` and will also be placed in `~/html/seating/`
-
-You can find the output in the out folder :)
 
 ## Additional features (not yet available with go_brr.py) ##
 *   Lefty roster
