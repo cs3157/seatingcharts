@@ -207,15 +207,23 @@ def run(slug, layout, title=None, lefty=False, debug=False):
                 .selected {
                     background-color: orange;
                 }
+                .selected-count-line {
+                    text-align: center;
+                }
         </style>
 
         <script>
+            let selectedSeatCounter = 0;
             function selectStudent(cell) {
                 if (cell.className === "unselected") {
                     cell.className = "selected";
+                    selectedSeatCounter++;
                 } else {
                     cell.className = "unselected";
+                    selectedSeatCounter--;
                 }
+
+                document.getElementById('selected-counter').innerText = selectedSeatCounter.toString();
             }
         </script>
         <body><table border=1>\n\n""")
@@ -255,7 +263,7 @@ def run(slug, layout, title=None, lefty=False, debug=False):
                 seating_chart.write("<td></td>\n")
 
             seating_chart.write("</tr>\n\n")
-        seating_chart.write("</table></body>")
+        seating_chart.write('</table><p class="selected-count-line"><span id="selected-counter">0</span> seats selected.</p></body>')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
