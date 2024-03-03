@@ -6,7 +6,9 @@ import math
 import os
 import random
 import rosters
+import seatingchart
 import shutil
+import traceback
 from pathlib import Path
 
 import csv2pdf
@@ -101,10 +103,12 @@ def main():
                     output.writerow(student)
             csvfile.flush()
 
-        # Check if the os.system call is successful
-        if os.system(f"./seatingchart.py {rname} {rname}") != 0:
+        try:
+            seatingchart.run(slug=rname, layout=rname)
+        except Exception as e:
+            print(traceback.format_exc())
             print(RED+"Error: seatingchart.py failed"+END)
-            return
+            exit(-1)
 
         shutil.copy(ROOM_CHART_PATH, HTML_ROOM_PATH)
 

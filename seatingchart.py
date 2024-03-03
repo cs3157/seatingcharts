@@ -26,32 +26,32 @@ def working_dir_path(name, slug, extension):
     return Path("out") / slug / filename
 
 
-def main(args):
+def run(slug, layout, title=None, lefty=False, debug=False):
     # 1) a list of seats, in order of preference, with optionally ignored blank lines and repeats allowed
     #    basically tab/newline separated, with no difference between them
-    SEATS_IN_ORDER = Path("layouts") / f"{args.layout}_ordered.txt"
+    SEATS_IN_ORDER = Path("layouts") / f"{layout}_ordered.txt"
     assert_file_exists(SEATS_IN_ORDER)
 
     # 1.5) a list of lefty seats, in order of preference, with optionally ignored blank lines and
     #      repeats allowed, basically tab/newline separated with no difference between them
-    if args.lefty:
-        LSEATS_IN_ORDER = Path("layouts") / f"{args.layout}_lefty_ordered.txt"
+    if lefty:
+        LSEATS_IN_ORDER = Path("layouts") / f"{layout}_lefty_ordered.txt"
         assert_file_exists(LSEATS_IN_ORDER)
 
     # 2) a CSV list of students, one per line.
     # i.e., what you get if you download a gradebook from courseworks
-    STUDENT_LIST = working_dir_path("roster", args.slug, "csv")
+    STUDENT_LIST = working_dir_path("roster", slug, "csv")
     assert_file_exists(STUDENT_LIST)
 
     # 2.5) a CSV list of students, one per line.
     # i.e., what you get if you download a gradebook from courseworks
-    if args.lefty:
-        LSTUDENT_LIST = working_dir_path("lefty_roster", args.slug, "csv")
+    if lefty:
+        LSTUDENT_LIST = working_dir_path("lefty_roster", slug, "csv")
         assert_file_exists(LSTUDENT_LIST)
 
     # two lists, of students to assign first and last
-    assign_first_path = working_dir_path("assign-first", args.slug, "txt")
-    assign_last_path = working_dir_path("assign-last", args.slug, "txt")
+    assign_first_path = working_dir_path("assign-first", slug, "txt")
+    assign_last_path = working_dir_path("assign-last", slug, "txt")
 
     ASSIGN_FIRST = assign_first_path if assign_first_path.is_file() else "/dev/null"
     ASSIGN_LAST = assign_last_path if assign_last_path.is_file() else "/dev/null"
@@ -59,21 +59,21 @@ def main(args):
     photos_path = Path("images")
 
     # 3) a tsv file containing the format of the room
-    layout_path = Path("layouts") / f"{args.layout}.txt"
+    layout_path = Path("layouts") / f"{layout}.txt"
     assert_file_exists(layout_path)
     LAYOUT = layout_path
 
     # outputs:
-    TITLE = args.title if args.title is not None else f"{args.slug} Seating"
+    TITLE = title if title is not None else f"{slug} Seating"
 
     # a CSV student id ordered list of assigned seats
-    OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
+    OUTPUT_CSV = working_dir_path("list", slug, "csv")
 
     # a pretty HTML version of uni <-> seats
-    OUTPUT_HTML = working_dir_path("list", args.slug, "html")
+    OUTPUT_HTML = working_dir_path("list", slug, "html")
 
     # an HTML page with seat, student, and photo
-    OUTPUT_CHART = working_dir_path("chart", args.slug, "html")
+    OUTPUT_CHART = working_dir_path("chart", slug, "html")
 
     # Now we're ready to assign seats
     assignments = {}
@@ -114,12 +114,12 @@ def main(args):
             except:
                 # Assigned all students
                 break
-            if args.debug:
+            if debug:
                 print("assigned", assignments[seat], "to", seat)
     if students:
         print("WARNING: unassigned students", students)
 
-    if args.lefty:
+    if lefty:
         with open(LSEATS_IN_ORDER, "r") as f:
             lseats = f.readlines()
         lseats = [s for s in lseats if s[0] != "#"]
@@ -135,7 +135,7 @@ def main(args):
                 except:
                     # All lefties assigned
                     break
-                if args.debug:
+                if debug:
                     print("assigned lefty", assignments[lseat], "to", lseat)
         if lstudents:
             print("WARNING: unassigned lefties", lstudents)
@@ -286,4 +286,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args)
+    run(args.slug, args.layout, args.title, args.lefty, args.debug)
