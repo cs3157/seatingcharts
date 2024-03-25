@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import requests
-import re
 import argparse
 import os
+import re
+import requests
+
 import rosters
 
 TITLE_ART = """

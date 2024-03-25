@@ -8,8 +8,9 @@ import argparse
 import csv
 import itertools
 import random
-import rosters
 from pathlib import Path
+
+import rosters
 
 def assert_file_exists(path):
     if not path.is_file():

@@ -5,13 +5,14 @@ import csv
 import math
 import os
 import random
-import rosters
-import seatingchart
 import shutil
 import traceback
 from pathlib import Path
 
 import csv2pdf
+
+import rosters
+import seatingchart
 
 OUT_PATH = Path.cwd() / "out"
 HTML_PATH = Path.home() / "html" / "seating"
