@@ -1,9 +1,9 @@
-# seatingcharts #
+# seatingcharts
 
 A collection of scripts to produce a randomized set of seating assignments.
 
 
-## Scripts ##
+## Scripts
 
 * `seatingchart.py` - The core of this toolset. Creates seating assignments for a single room and produces HTML output. Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming.
 * `go_brr.py` - Splits a larger roster into sub-rosters, one per room, and calls `seatingchart.py` for each one. Written by XXXurxo.
@@ -11,7 +11,7 @@ A collection of scripts to produce a randomized set of seating assignments.
 * `imagedl.py` - Downloads students' photos. Written by Carl.
 * `rosters.py` - Downloads the student roster from Canvas. It is also used by other scripts to parse roster csv files. Writen by Carl.
 
-## Usage ##
+## Usage
 
 1. Download the roster CSV file. This can either be done manually by going into the 'Grades' tab on Courseworks and selecting Export > Export Entire Gradebook or by using `rosters.py --download roster_filename.csv` (this requires a Canvas API key)
 
@@ -23,9 +23,9 @@ A collection of scripts to produce a randomized set of seating assignments.
 
 5. Profit! The output can be found in `out/` and will also be placed in `~/html/seating/`
 
-## Room format ##
+## Room format
 
-### rooms file ###
+### rooms file
 This is the file passed to `go_brr.py`. It follows the following format
 ```
 room1name room1seatcount
@@ -44,7 +44,7 @@ SEAT7	SEAT8	SEAT9		SEAT10	SEAT11	SEAT12
 2. The fill order file, `room1name_ordered.txt`
 This file determines in what order to fill seats. Exact semantics don't matter much (i.e. spaces, tabs and line breaks are functionally identical) though lines starting with hash (#) symbols will be ignored.
 
-## Additional features (not yet available with go_brr.py) ##
+## Additional features (not yet available with go_brr.py)
 *   Lefty roster
     -   Ensure that your classroom has a `<classroom>_lefty_ordered.txt` file.
     -   Move lefties from `roster_<slug>.csv` to a new file called
@@ -61,7 +61,7 @@ This file determines in what order to fill seats. Exact semantics don't matter m
         other reason to be absent.
 
 
-### Running the `seatingchart.py` script ###
+### Running the `seatingchart.py` script
 
 The usage of the command is as follows:
 
@@ -100,7 +100,7 @@ Once the script runs, it will output:
     `mail.py`.
 
 
-### Emailing students their seating assignments ###
+### Emailing students their seating assignments
 
 You can now use mail.py to send individual emails to students with their seat assignment.
 
@@ -110,7 +110,7 @@ You can now use mail.py to send individual emails to students with their seat as
 * Change the name and email in the script.
 
 
-### Adding support for new classrooms ###
+### Adding support for new classrooms
 
 In general, the script works by:
 
