@@ -120,8 +120,8 @@ def main():
             seatingchart.run(slug=rname, layout=rname)
         except Exception as e:
             print(traceback.format_exc())
-            print(RED+"Error: seatingchart.py failed"+END)
-            exit(-1)
+            print(RED + "Error: seatingchart.py failed" + END)
+            exit(1)
 
         shutil.copy(ROOM_CHART_PATH, HTML_ROOM_PATH)
 
@@ -142,7 +142,7 @@ def main():
     HTML_PDF_PATH.chmod(0o644)
     seat_csv_path.unlink()
 
-    print(GREEN+"Success!"+END)
+    print(GREEN + "Success!" + END)
 
 if __name__ == "__main__":
     main()

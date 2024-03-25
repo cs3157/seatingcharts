@@ -88,11 +88,11 @@ if __name__ == '__main__':
             with open(args.download, 'w') as f:
                 csv.writer(f).writerows(students)
 
-            print(GREEN+"Roster saved successfully."+END)
+            print(GREEN + "Roster saved successfully." + END)
         except KeyboardInterrupt:
-            print(RED+"Download cancelled."+END)
+            print(RED + "Download cancelled." + END)
         except Exception:
-            print(RED+"Failed to download roster. Please check your API key and course ID"+END)
+            print(RED + "Failed to download roster. Please check your API key and course ID" + END)
 
     if args.read:
         students = load_roster(args.read)
