@@ -13,7 +13,7 @@ TITLE_ART = """
        _/ //  ' \/ _ `/ _ `/ -_) // / /__
       /___/_/_/_/\_,_/\_, /\__/____/____/
                      /___/               
-                     """
+"""
 
 YELLOW = "\033[1;33m"
 LIGHT_BLUE = "\033[1;34m"
@@ -107,7 +107,6 @@ def run_guide(output_dir, unis=None, roster_filepath=None, skip_existing=False):
     if input("Are you ready to begin? (Y/n) ") not in ['Y','y','']:
         print('Aborted.')
         exit(0)
-
   
     do_dl(url_prefix,headers,unis,output_dir)
 
