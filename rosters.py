@@ -16,7 +16,7 @@ def download_roster(course_id, canvas_api_key):
     response = requests.get(f'https://courseworks2.columbia.edu/api/v1/courses/{course_id}/students',
             headers={'Authorization': f'Bearer {canvas_api_key}'}).json()
 
-    response = list(filter(lambda x: x['sortable_name'] != 'Student, Test', response))
+    response = [x for x in response if x['sortable_name'] != 'Student, Test']
 
     return [(user['login_id'], user['sortable_name']) for user in response]
 
@@ -33,17 +33,13 @@ def load_roster(csv_file_path):
         # Check if the roster has the Canvas header
         first_line = csvfile.readline()
         csvfile.seek(0) # Reset cursor
+        
+        # Check if the file has a Courseworks header
         if 'SIS Login ID' in first_line:
-            reader = csv.DictReader(csvfile)
-            return list(
-                        map(lambda row: (row['SIS Login ID'], row['Student']),
-                            filter(lambda row: len(row['SIS Login ID']) > 0 and row['Student'] != 'Student, Test',
-                               reader
-                            )
-                        )
-                    )
+            return [(row['SIS Login ID'], row['Student']) for row in reader
+                    if len(row['SIS Login ID']) > 0 and row['Student'] != 'Student, Test'] 
         else:
-            students = list(map(tuple, map(discard_last_if_empty, csv.reader(csvfile))))
+            students = [tuple(discard_last_if_empty(row)) for row in csv.reader(csvfile)]
 
             for student in students:
                 if len(student) != 2:
@@ -53,7 +49,7 @@ def load_roster(csv_file_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Load and download Canvas student rosters")
+        description="Download and parse Canvas student rosters.")
 
     parser.add_argument("--read",
                         type=str,
