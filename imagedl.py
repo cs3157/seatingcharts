@@ -28,27 +28,30 @@ def multiline_input():
         else:
             return lines
 
-
+# Used to extract the image download URL and required headers
+# from the cUrl string copied from the browser
 def parse_curl(curl):
+  # Extract the url by finding the content of the first single-quote pair
   url = re.search("'([^']*)'", curl[0]).group(1)
 
   headers = {}
   for line in curl[1:]:
       if line.strip().startswith('-H'):
+          # Extract the header by once again finding the content of the single-quote pair 
           header_name, header_value = re.search("'([^']*)'", line).group(1).split(': ')
           headers[header_name] = header_value
 
-  return url,headers
+  return url, headers
 
 def do_dl(url_prefix, headers, unis, output_dir):
     counter = 0
     uni_count = len(unis)
     for uni in unis:
-        url = url_prefix+uni+'.jpg'
+        url = f'{url_prefix}{uni}.jpg'
         
         counter += 1
-        percentage = f"{round(counter/uni_count*100, 1)}%"
-        print("Downloading", url, f"({counter}/{uni_count} -- {percentage})")
+        percentage = round(counter / uni_count * 100, 1)
+        print("Downloading", url, f"({counter}/{uni_count} -- {percentage}%)")
         response = requests.get(url, headers=headers)
 
         with open(os.path.join(output_dir, uni+'.jpg'), 'wb') as f:
@@ -58,11 +61,10 @@ last_step_number = 0
 def step(instruction):
     global last_step_number
 
-    print(f'[{last_step_number}]', instruction)
+    input(f'[{last_step_number}] {instruction}')
     last_step_number += 1
-    input()
 
-def run_guide(output_dir, unis=None, roster_filepath=None, skip_existing=False):
+def run_guide(output_dir, roster_filepath, skip_existing=False):
     print(TITLE_ART)
     print("Python utility to download student images automatically")
 
@@ -70,24 +72,20 @@ def run_guide(output_dir, unis=None, roster_filepath=None, skip_existing=False):
         print("Output directory does not exist. Creating...")
         os.mkdir(output_dir)
 
-    if unis is None and roster_filepath is not None:
-        print("Loading roster...")
-        students = rosters.load_roster(roster_filepath)
-        print(f"Loaded {len(students)} from roster.")
-        unis = set(map(lambda student: student[0], students))
+    print("Loading roster...")
+    students = rosters.load_roster(roster_filepath)
+    print(f"Loaded {len(students)} from roster.")
+    unis = set(map(lambda student: student[0], students))
 
-        if skip_existing:
-            skipped_unis = set(map(lambda file: file.split('.')[0], os.listdir(output_dir))).intersection(unis)
-            unis = unis.difference(skipped_unis)
-            print(f"{YELLOW}{len(skipped_unis)} UNIs already have images in the output directory and will be skipped.{END}")
-
-    else:
-        raise Exception("unis and roster_filepath cannot both be None")
-  
+    if skip_existing:
+        skipped_unis = set(map(lambda file: file.split('.')[0], os.listdir(output_dir))).intersection(unis)
+        unis = unis.difference(skipped_unis)
+        print(f"{YELLOW}{len(skipped_unis)} UNIs already have images in the output directory and will be skipped.{END}")
+ 
     uni_count = len(unis)
     print(f"Found {uni_count} UNIs")
 
-    print(YELLOW + "The instructions were designed for chromium based browsers and might differ on other browsers.\n" + END)
+    print(YELLOW + "The instructions were designed for Chromium-based browsers and might differ on other browsers.\n" + END)
     print(LIGHT_BLUE + "This utility will guide you through a series of steps. Once you complete a step, press ENTER" + END)
     step("Press ENTER to begin")
     step("Open canvas/courseworks and go to the relevant course, then open your browser's developer tools. Find the network tab and press 'clear'")
@@ -98,7 +96,10 @@ def run_guide(output_dir, unis=None, roster_filepath=None, skip_existing=False):
     curl = multiline_input()
 
     url, headers = parse_curl(curl)
-    url_prefix = "/".join(url.split('/')[:-1])+'/'
+
+    # Remove the file name from the url
+    # i.e. "hostname/path/uni.jpg" -> "hostname/path/"
+    url_prefix = "/".join(url.split('/')[:-1]) + '/'
 
     print("Extracted URL prefix:", url_prefix)
     print(f"Extracted {len(headers)} headers:", headers)
@@ -108,12 +109,12 @@ def run_guide(output_dir, unis=None, roster_filepath=None, skip_existing=False):
         print('Aborted.')
         exit(0)
   
-    do_dl(url_prefix,headers,unis,output_dir)
+    do_dl(url_prefix, headers, unis, output_dir)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-    description="Download student images")
+    description="Download student images from Courseworks")
 
     parser.add_argument("--outdir",
                        type=str,
