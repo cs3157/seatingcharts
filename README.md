@@ -26,15 +26,19 @@ A collection of scripts to produce a randomized set of seating assignments.
 ## Room format
 
 ### rooms file
+
 This is the file passed to `go_brr.py`. It follows the following format
+
 ```
 room1name room1seatcount
 room2name room2seatcount
 ...
 ```
+
 For each room, the `layouts` directory must contain two additional files:
 1. The visual layout file, `room1name.txt`
 This file determines the general layout of a room as it will be reflected on the HTML seating chart. Seats must be separated by a TAB character
+
 ```
 SEAT1	SEAT2	SEAT3		SEAT4	SEAT5	SEAT6
 SEAT7	SEAT8	SEAT9		SEAT10	SEAT11	SEAT12
