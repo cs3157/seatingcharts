@@ -36,7 +36,7 @@ def load_roster(csv_file_path):
         
         # Check if the file has a Courseworks header
         if 'SIS Login ID' in first_line:
-            return [(row['SIS Login ID'], row['Student']) for row in reader
+            return [(row['SIS Login ID'], row['Student']) for row in csv.DictReader(csvfile)
                     if len(row['SIS Login ID']) > 0 and row['Student'] != 'Student, Test'] 
         else:
             students = [tuple(discard_last_if_empty(row)) for row in csv.reader(csvfile)]
