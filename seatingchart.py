@@ -171,7 +171,7 @@ def run(slug, layout, title=None, lefty=False, debug=False):
     with open(OUTPUT_CSV, "w") as output:
         csv_output = csv.writer(output)
         for seat, student in assignments.items():
-            csv_output.writerow(student + [seat]) # Student is a list of the form [uni, name]
+            csv_output.writerow(student + (seat,)) # Student is a tuple of the form (uni, name)
 
     # Write the chart
     with open(LAYOUT) as layout:
