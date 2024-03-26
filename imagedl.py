@@ -57,8 +57,7 @@ def do_dl(url_prefix, headers, unis, output_dir):
         print(LINE_UP, end=LINE_CLEAR) # CLear previous line
         response = requests.get(url, headers=headers)
 
-        with (output_dir / f"{uni}.jpg").open('wb') as f:
-            f.write(response.content)
+        (output_dir / f"{uni}.jpg").write_bytes(response.content)
 
     print(GREEN + "Download complete." + END)
         
