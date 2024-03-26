@@ -4,6 +4,7 @@ import argparse
 import os
 import re
 import requests
+from pathlib import Path
 
 import rosters
 
@@ -56,7 +57,7 @@ def do_dl(url_prefix, headers, unis, output_dir):
         print(LINE_UP, end=LINE_CLEAR) # CLear previous line
         response = requests.get(url, headers=headers)
 
-        with open(os.path.join(output_dir, uni+'.jpg'), 'wb') as f:
+        with (output_dir / f"{uni}.jpg").open('wb') as f:
             f.write(response.content)
 
     print(GREEN + "Download complete." + END)
@@ -72,9 +73,9 @@ def run_guide(output_dir, roster_filepath, skip_existing=False):
     print(TITLE_ART)
     print("Python utility to download student images automatically")
 
-    if not os.path.exists(output_dir):
+    if not output_dir.exists():
         print("Output directory does not exist. Creating...")
-        os.mkdir(output_dir)
+        output_dir.mkdir()
 
     print("Loading roster...")
     students = rosters.load_roster(roster_filepath)
@@ -82,7 +83,8 @@ def run_guide(output_dir, roster_filepath, skip_existing=False):
     unis = set(map(lambda student: student[0], students))
 
     if skip_existing:
-        skipped_unis = set(map(lambda file: file.split('.')[0], os.listdir(output_dir))).intersection(unis)
+        skipped_unis = {file.stem for file in output_dir.iterdir()}.intersection(unis)
+        
         unis = unis.difference(skipped_unis)
         print(f"{YELLOW}{len(skipped_unis)} UNIs already have images in the output directory and will be skipped.{END}")
  
@@ -107,7 +109,7 @@ def run_guide(output_dir, roster_filepath, skip_existing=False):
 
     print("Extracted URL prefix:", url_prefix)
     print(f"Extracted {len(headers)} headers:", headers)
-    print(f"\n{LIGHT_BLUE}The script will now pretend to be your browser and download {uni_count} images to the '{output_dir}' directory.{END}")
+    print(f"\n{LIGHT_BLUE}The script will now pretend to be your browser and download {uni_count} images to the '{output_dir.as_posix()}' directory.{END}")
 
     if input("Are you ready to begin? (Y/n) ") not in ['Y','y','']:
         print('Aborted.')
@@ -138,4 +140,4 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
-    run_guide(output_dir=args.outdir, roster_filepath=args.roster, skip_existing=args.skip_existing)
+    run_guide(output_dir=Path(args.outdir), roster_filepath=Path(args.roster), skip_existing=args.skip_existing)

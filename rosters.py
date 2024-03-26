@@ -6,6 +6,7 @@ import os
 import re
 import requests
 from getpass import getpass
+from pathlib import Path
 
 # ANSI color codes
 GREEN = "\033[01;92m"
@@ -29,7 +30,9 @@ def discard_last_if_empty(elements):
 
 
 def load_roster(csv_file_path):
-    with open(csv_file_path, newline='') as csvfile:
+    csv_file_path = Path(csv_file_path) # Won't do anything if csv_file_path is already a Path
+
+    with csv_file_path.open(newline='') as csvfile:
         # Check if the roster has the Canvas header
         first_line = csvfile.readline()
         csvfile.seek(0) # Reset cursor
