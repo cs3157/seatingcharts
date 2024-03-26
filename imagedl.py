@@ -15,18 +15,19 @@ TITLE_ART = """
                      /___/               
 """
 
+GREEN = "\033[92m"
 YELLOW = "\033[1;33m"
 LIGHT_BLUE = "\033[1;34m"
 END = "\033[0m"
+LINE_CLEAR = "\x1b[2K"
+LINE_UP = "\033[1A"
 
 def multiline_input():
     lines = []
-    while True:
-        inpt = input()
-        if len(inpt) > 0:
-            lines.append(inpt)
-        else:
-            return lines
+    while (inpt := input()):
+        lines.append(inpt)
+
+    return lines
 
 # Used to extract the image download URL and required headers
 # from the cUrl string copied from the browser
@@ -51,17 +52,20 @@ def do_dl(url_prefix, headers, unis, output_dir):
         
         counter += 1
         percentage = round(counter / uni_count * 100, 1)
-        print("Downloading", url, f"({counter}/{uni_count} -- {percentage}%)")
+        print(f"Downloading {uni}.jpg ({counter}/{uni_count} -- {percentage}%)")
+        print(LINE_UP, end=LINE_CLEAR) # CLear previous line
         response = requests.get(url, headers=headers)
 
         with open(os.path.join(output_dir, uni+'.jpg'), 'wb') as f:
             f.write(response.content)
+
+    print(GREEN + "Download complete." + END)
         
 last_step_number = 0
-def step(instruction):
+def step(instruction, await_input=True):
     global last_step_number
 
-    input(f'[{last_step_number}] {instruction}')
+    (input if await_input else print)(f'[{last_step_number}] {instruction}')
     last_step_number += 1
 
 def run_guide(output_dir, roster_filepath, skip_existing=False):
@@ -90,7 +94,7 @@ def run_guide(output_dir, roster_filepath, skip_existing=False):
     step("Press ENTER to begin")
     step("Open canvas/courseworks and go to the relevant course, then open your browser's developer tools. Find the network tab and press 'clear'")
     step("Navigate to 'Photo Roster' section on the course canvas page and wait for images to load (this can take a while)")
-    step("The network tab should fill with requests to images named named after student's unis. Right click one of these requests and select 'Copy as cURL (bash)'. Be careful NOT to select the option saying 'Copy ALL'")
+    step("The network tab should fill with requests to images named named after students' unis. Right click one of these requests and select 'Copy as cURL (bash)'. Be careful NOT to select the option saying 'Copy ALL'", await_input=False)
     print(LIGHT_BLUE + "Paste the copied text in this window. If the script doesn't continue automatically, press ENTER." + END)
 
     curl = multiline_input()
