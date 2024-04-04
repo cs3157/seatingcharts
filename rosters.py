@@ -30,7 +30,10 @@ def discard_last_if_empty(elements):
     else:
         return elements[:-1]
 
-
+# This expects the input CSV file to have at least the following two columns:
+# SIS Login ID - Containing the UNIs
+# Student      - The full name of the student
+# and a header specifying these columns
 def load_roster(csv_file_path):
     print(f"[rosters] Loading {csv_file_path}")
     csv_file_path = Path(csv_file_path) # Won't do anything if csv_file_path is already a Path
@@ -39,6 +42,7 @@ def load_roster(csv_file_path):
         return [(row['SIS Login ID'], row['Student']) for row in csv.DictReader(csvfile)
             if len(row['SIS Login ID']) > 0 and row['Student'] != 'Student, Test'] 
 
+# Note: The saved file will have a header of the form "SIS Login ID,Student"
 def save_roster(students, csv_file_path):
     csv_file_path = Path(csv_file_path)
 
