@@ -242,8 +242,6 @@ def run(slug, layout, title=None, lefty=False, debug=False):
                     student = assignments[seat]
                     uni = student[0]
                     name = student[1]
-                    full_name = name.split(", ")
-                    full_name = f"{full_name[1]} {full_name[0]}"
 
                     # Used to check if file exists
                     img_path = photos_path / f"{uni}.jpg"
