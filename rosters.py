@@ -32,25 +32,35 @@ def discard_last_if_empty(elements):
 
 
 def load_roster(csv_file_path):
+    print(f"[rosters] Loading {csv_file_path}")
     csv_file_path = Path(csv_file_path) # Won't do anything if csv_file_path is already a Path
 
     with csv_file_path.open(newline='') as csvfile:
-        # Check if the roster has the Canvas header
-        first_line = csvfile.readline()
-        csvfile.seek(0) # Reset cursor
-        
-        # Check if the file has a Courseworks header
-        if 'SIS Login ID' in first_line:
-            return [(row['SIS Login ID'], row['Student']) for row in csv.DictReader(csvfile)
-                    if len(row['SIS Login ID']) > 0 and row['Student'] != 'Student, Test'] 
-        else:
-            students = [tuple(discard_last_if_empty(row)) for row in csv.reader(csvfile)]
+        return [(row['SIS Login ID'], row['Student']) for row in csv.DictReader(csvfile)
+            if len(row['SIS Login ID']) > 0 and row['Student'] != 'Student, Test'] 
 
-            for student in students:
-                if len(student) != 2:
-                    raise Exception(f"Invalid row format: {student}")
+def save_roster(students, csv_file_path):
+    csv_file_path = Path(csv_file_path)
 
-            return students
+    with csv_file_path.open('w') as f:
+        # Write the header followed by the students
+        csv.writer(f).writerows([('SIS Login ID', 'Student')] + students)
+
+def print_table(students):
+    # Store the maximum length of each column
+    max_widths = [max(len(str(item)) for item in column) for column in zip(*students)]
+
+    # Print the table header
+    print("+" + "+".join(["-" * (width + 2) for width in max_widths]) + "+")
+    print("|" + "|".join([f" {header:<{max_widths[i]}} " for i, header in enumerate(["UNI", "Name"])]) + "|")
+    print("+" + "+".join(["-" * (width + 2) for width in max_widths]) + "+")
+
+    # Print the rows
+    for row in students:
+        print("|" + "|".join([f" {str(item):<{max_widths[i]}} " for i, item in enumerate(row)]) + "|")
+    
+    # Close the table
+    print("+" + "+".join(["-" * (width + 2) for width in max_widths]) + "+")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -86,9 +96,7 @@ if __name__ == '__main__':
         
         try:
             students = download_roster(canvas_course_id, canvas_api_key)
-            with open(args.download, 'w') as f:
-                csv.writer(f).writerows(students)
-
+            save_roster(students, args.download)
             print(GREEN + "Roster saved successfully." + END)
         except KeyboardInterrupt:
             print(RED + "Download cancelled." + END)
@@ -97,7 +105,7 @@ if __name__ == '__main__':
 
     if args.read:
         students = load_roster(args.read)
-        print(students)
+        print_table(students)
         print("Student count:", len(students))
 
     if args.read is None and args.download is None:

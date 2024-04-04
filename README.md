@@ -9,7 +9,7 @@ A collection of scripts to produce a randomized set of seating assignments.
 * `go_brr.py` - Splits a larger roster into sub-rosters, one per room, and calls `seatingchart.py` for each one. Written by XXXurxo.
 * `mail.py` - Sends individual seating assignments to students by email
 * `imagedl.py` - Downloads students' photos. Written by Carl.
-* `rosters.py` - This file serves both as a utility to download student rosters from Canvas and as a local library to parse roster CSV files. It offers flexibility as it can handle rosters exported from Canvas (through the "Grades" tab) which have a header and a lot of extraneous columns, in addition to normalized CSV files with columns `uni, name` and no header. Written by Carl.
+* `rosters.py` - This file serves both as a utility to download student rosters from Canvas and as a local library to parse roster CSV files. Files read by this script are expected to have a header specifying the `SIS Login ID` column for UNIs and the `Student` column for full names. This header will also be added to downloaded rosters. Written by Carl.
 
 ## Usage
 

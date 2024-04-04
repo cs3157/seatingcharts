@@ -107,15 +107,15 @@ def main():
         ROOM_OUT_PATH.mkdir(parents=True)
         ROOM_IMAGES_PATH.symlink_to(Path("images"))
 
-        with ROOM_ROSTER_PATH.open("w", newline='') as csvfile:
-            output = csv.writer(csvfile)
-            num_seats = math.ceil(student_count / seat_count * int(rcount))
-            for _ in range(num_seats):
-                if student_index < student_count:
-                    student = students[student_index]
-                    student_index += 1
-                    output.writerow(student)
-            csvfile.flush()
+        room_students = []
+        num_seats = math.ceil(student_count / seat_count * int(rcount))
+        for _ in range(num_seats):
+            if student_index < student_count:
+                student = students[student_index]
+                student_index += 1
+                room_students.append(student)
+
+        rosters.save_roster(room_students, ROOM_ROSTER_PATH)
 
         try:
             seatingchart.run(slug=rname, layout=rname)
