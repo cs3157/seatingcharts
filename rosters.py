@@ -17,6 +17,8 @@ def download_roster(course_id, canvas_api_key):
     response = requests.get(f'https://courseworks2.columbia.edu/api/v1/courses/{course_id}/students',
             headers={'Authorization': f'Bearer {canvas_api_key}'}).json()
 
+    # Courseworks has a fake student called "Test Student" that we ignore here so as not to include
+    # it in the roster
     response = [x for x in response if x['sortable_name'] != 'Student, Test']
 
     return [(user['login_id'], user['sortable_name']) for user in response]
