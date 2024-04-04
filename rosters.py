@@ -97,11 +97,11 @@ if __name__ == '__main__':
         try:
             students = download_roster(canvas_course_id, canvas_api_key)
             save_roster(students, args.download)
-            print(GREEN + "Roster saved successfully." + END)
+            print(f"{GREEN}Roster saved successfully. (Found {len(students)} students){END}")
         except KeyboardInterrupt:
-            print(RED + "Download cancelled." + END)
+            print(f"{RED}Download cancelled.{END}")
         except Exception:
-            print(RED + "Failed to download roster. Please check your API key and course ID" + END)
+            print(f"{RED}Failed to download roster. Please check your API key and course ID{END}")
 
     if args.read:
         students = load_roster(args.read)
