@@ -35,7 +35,6 @@ def discard_last_if_empty(elements):
 # Student      - The full name of the student
 # and a header specifying these columns
 def load_roster(csv_file_path):
-    print(f"[rosters] Loading {csv_file_path}")
     csv_file_path = Path(csv_file_path) # Won't do anything if csv_file_path is already a Path
 
     with csv_file_path.open(newline='') as csvfile:
