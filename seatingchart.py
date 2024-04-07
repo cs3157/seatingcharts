@@ -10,6 +10,8 @@ import itertools
 import random
 from pathlib import Path
 
+import rosters
+
 def assert_file_exists(path):
     if not path.is_file():
         print(f"Missing required file: {path}")
@@ -25,32 +27,32 @@ def working_dir_path(name, slug, extension):
     return Path("out") / slug / filename
 
 
-def main(args):
+def run(slug, layout, title=None, lefty=False, debug=False):
     # 1) a list of seats, in order of preference, with optionally ignored blank lines and repeats allowed
     #    basically tab/newline separated, with no difference between them
-    SEATS_IN_ORDER = Path("layouts") / f"{args.layout}_ordered.txt"
+    SEATS_IN_ORDER = Path("layouts") / f"{layout}_ordered.txt"
     assert_file_exists(SEATS_IN_ORDER)
 
     # 1.5) a list of lefty seats, in order of preference, with optionally ignored blank lines and
     #      repeats allowed, basically tab/newline separated with no difference between them
-    if args.lefty:
-        LSEATS_IN_ORDER = Path("layouts") / f"{args.layout}_lefty_ordered.txt"
+    if lefty:
+        LSEATS_IN_ORDER = Path("layouts") / f"{layout}_lefty_ordered.txt"
         assert_file_exists(LSEATS_IN_ORDER)
 
     # 2) a CSV list of students, one per line.
     # i.e., what you get if you download a gradebook from courseworks
-    STUDENT_LIST = working_dir_path("roster", args.slug, "csv")
+    STUDENT_LIST = working_dir_path("roster", slug, "csv")
     assert_file_exists(STUDENT_LIST)
 
     # 2.5) a CSV list of students, one per line.
     # i.e., what you get if you download a gradebook from courseworks
-    if args.lefty:
-        LSTUDENT_LIST = working_dir_path("lefty_roster", args.slug, "csv")
+    if lefty:
+        LSTUDENT_LIST = working_dir_path("lefty_roster", slug, "csv")
         assert_file_exists(LSTUDENT_LIST)
 
     # two lists, of students to assign first and last
-    assign_first_path = working_dir_path("assign-first", args.slug, "txt")
-    assign_last_path = working_dir_path("assign-last", args.slug, "txt")
+    assign_first_path = working_dir_path("assign-first", slug, "txt")
+    assign_last_path = working_dir_path("assign-last", slug, "txt")
 
     ASSIGN_FIRST = assign_first_path if assign_first_path.is_file() else "/dev/null"
     ASSIGN_LAST = assign_last_path if assign_last_path.is_file() else "/dev/null"
@@ -58,21 +60,21 @@ def main(args):
     photos_path = Path("images")
 
     # 3) a tsv file containing the format of the room
-    layout_path = Path("layouts") / f"{args.layout}.txt"
+    layout_path = Path("layouts") / f"{layout}.txt"
     assert_file_exists(layout_path)
     LAYOUT = layout_path
 
     # outputs:
-    TITLE = args.title if args.title is not None else f"{args.slug} Seating"
+    TITLE = title if title is not None else f"{slug} Seating"
 
     # a CSV student id ordered list of assigned seats
-    OUTPUT_CSV = working_dir_path("list", args.slug, "csv")
+    OUTPUT_CSV = working_dir_path("list", slug, "csv")
 
     # a pretty HTML version of uni <-> seats
-    OUTPUT_HTML = working_dir_path("list", args.slug, "html")
+    OUTPUT_HTML = working_dir_path("list", slug, "html")
 
     # an HTML page with seat, student, and photo
-    OUTPUT_CHART = working_dir_path("chart", args.slug, "html")
+    OUTPUT_CHART = working_dir_path("chart", slug, "html")
 
     # Now we're ready to assign seats
     assignments = {}
@@ -89,8 +91,7 @@ def main(args):
     with open(ASSIGN_FIRST, "r") as f:
         assign_first = [x.strip() for x in f.readlines()]
 
-    with open(STUDENT_LIST, "r") as f:
-        students = [tuple(s) for s in csv.reader(f)]
+    students = rosters.load_roster(STUDENT_LIST)
 
     random.shuffle(students)
 
@@ -114,18 +115,18 @@ def main(args):
             except:
                 # Assigned all students
                 break
-            if args.debug:
+            if debug:
                 print("assigned", assignments[seat], "to", seat)
     if students:
         print("WARNING: unassigned students", students)
 
-    if args.lefty:
+    if lefty:
         with open(LSEATS_IN_ORDER, "r") as f:
             lseats = f.readlines()
         lseats = [s for s in lseats if s[0] != "#"]
         lseats = list(itertools.chain.from_iterable([z.strip().split() for z in lseats]))
 
-        lstudents = [tuple(s) for s in csv.reader(open(LSTUDENT_LIST))][2:]
+        lstudents = rosters.load_roster(LSTUDENT_LIST)
         random.shuffle(lstudents)
 
         for lseat in lseats:
@@ -135,7 +136,7 @@ def main(args):
                 except:
                     # All lefties assigned
                     break
-                if args.debug:
+                if debug:
                     print("assigned lefty", assignments[lseat], "to", lseat)
         if lstudents:
             print("WARNING: unassigned lefties", lstudents)
@@ -162,16 +163,15 @@ def main(args):
         <body>
         <h3>%s</h3>
         <div class="assignments">\n\n""" % TITLE)
-        for seat, student in sorted(assignments.items(), key=lambda x: x[1][2]):  # sort by uni
-            html.write("""<div><span class="uni">%s</span> <span class="seat">%s</span></div>"""
-                    % (student[2], seat))
-        html.write("""</div></body>\n""")
+        for seat, student in sorted(assignments.items(), key=lambda x: x[1][0]):  # sort by uni
+            html.write(f'<div><span class="uni">{student[0]}</span> <span class="seat">{seat}</span></div>')
+        html.write('</div></body>\n')
 
     # dump to CSV as well
     with open(OUTPUT_CSV, "w") as output:
         csv_output = csv.writer(output)
-        for seat, uni in assignments.items():
-            csv_output.writerow(list(uni)[:2] + [seat])
+        for seat, student in assignments.items():
+            csv_output.writerow(student + (seat,)) # Student is a tuple of the form (uni, name)
 
     # Write the chart
     with open(LAYOUT) as layout:
@@ -208,15 +208,23 @@ def main(args):
                 .selected {
                     background-color: orange;
                 }
+                .selected-count-line {
+                    text-align: center;
+                }
         </style>
 
         <script>
+            let selectedSeatCounter = 0;
             function selectStudent(cell) {
                 if (cell.className === "unselected") {
                     cell.className = "selected";
+                    selectedSeatCounter++;
                 } else {
                     cell.className = "unselected";
+                    selectedSeatCounter--;
                 }
+
+                document.getElementById('selected-counter').innerText = selectedSeatCounter.toString();
             }
         </script>
         <body><table border=1>\n\n""")
@@ -232,14 +240,12 @@ def main(args):
 
                 try:
                     student = assignments[seat]
-                    uni = student[2]
-                    name = student[0]
-                    full_name = student[1].split(", ")
-                    full_name = f"{full_name[1]} {full_name[0]}"
+                    uni = student[0]
+                    name = student[1]
 
                     # Used to check if file exists
-                    img_path = photos_path / f"{name}.jpg"
-                    img_rel_path = photos_path / f"{name}.jpg"  # Inserted into HTML
+                    img_path = photos_path / f"{uni}.jpg"
+                    img_rel_path = photos_path / f"{uni}.jpg"  # Inserted into HTML
                     if img_path.is_file():
                         seating_chart.write("""<span class="seat">%s</span><br> %s<br> <span class="name">%s</span><br> <img src="%s">"""
                                             % (seat, uni, name, img_rel_path))
@@ -256,7 +262,7 @@ def main(args):
                 seating_chart.write("<td></td>\n")
 
             seating_chart.write("</tr>\n\n")
-        seating_chart.write("</table></body>")
+        seating_chart.write('</table><p class="selected-count-line"><span id="selected-counter">0</span> seats selected.</p></body>')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -284,7 +290,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--debug",
                         action="store_true",
                         help="print debug messages")
-    
+
     args = parser.parse_args()
 
-    main(args)
+    run(args.slug, args.layout, args.title, args.lefty, args.debug)

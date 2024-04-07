@@ -6,14 +6,34 @@ import math
 import os
 import random
 import shutil
+import traceback
 from pathlib import Path
 
 import csv2pdf
+
+import rosters
+import seatingchart
 
 OUT_PATH = Path.cwd() / "out"
 HTML_PATH = Path.home() / "html" / "seating"
 HTML_IMAGES_PATH = HTML_PATH / "images"
 HTML_PDF_PATH = HTML_PATH / "seat.pdf"
+
+# ANSI color codes
+GREEN = "\033[01;92m"
+RED = "\033[01;91m"
+END = "\033[0m"
+
+ASCII_ART = r"""
+ ________  ________          ________  ________  ________     
+|\   ____\|\   __  \        |\   __  \|\   __  \|\   __  \    
+\ \  \___|\ \  \|\  \       \ \  \|\ /\ \  \|\  \ \  \|\  \   
+ \ \  \  __\ \  \\\  \       \ \   __  \ \   _  _\ \   _  _\  
+  \ \  \|\  \ \  \\\  \       \ \  \|\  \ \  \\  \\ \  \\  \| 
+   \ \_______\ \_______\       \ \_______\ \__\\ _\\ \__\\ _\ 
+    \|_______|\|_______|        \|_______|\|__|\|__|\|__|\|__|
+                                                              
+"""
 
 def rename_images(img_path: Path) -> None:
     for img in img_path.glob("*"):
@@ -37,16 +57,17 @@ def init_seat_csv(seat_csv_path: Path) -> None:
 
 
 def main():
+    print(ASCII_ART)
+
     parser = argparse.ArgumentParser(description="Go brrr with the seating charts")
-    parser.add_argument("rooms", type=str, metavar='<rooms>')
-    parser.add_argument("roster", type=str, metavar='<roster>')
+    parser.add_argument("rooms", type=str, metavar='<rooms_file>')
+    parser.add_argument("roster", type=str, metavar='<roster_file>')
     args = parser.parse_args()
 
     ROOM_FILE = Path(args.rooms)
-    STUDENT_FILE = Path(args.roster)
 
-    with STUDENT_FILE.open() as f:
-        students = [tuple(s) for s in csv.reader(f)]
+    students = rosters.load_roster(args.roster)  
+    print(f"Found {len(students)} students in the roster file")
 
     random.shuffle(students)
     student_count = len(students)
@@ -63,8 +84,10 @@ def main():
     with ROOM_FILE.open('r') as f:
         rooms = [r.strip().split() for r in f.readlines() if r.strip()]
 
-    print(f"Rooms: {rooms}")
-    for _, count in rooms:
+    print("Rooms:")
+
+    for room_name, count in rooms:
+        print(f"- {room_name}: {count} seats")
         seat_count += int(count)
     print(f"Total seats: {seat_count}")
 
@@ -84,20 +107,22 @@ def main():
         ROOM_OUT_PATH.mkdir(parents=True)
         ROOM_IMAGES_PATH.symlink_to(Path("images"))
 
-        with ROOM_ROSTER_PATH.open("w", newline='') as csvfile:
-            output = csv.writer(csvfile)
-            num_seats = math.ceil(student_count / seat_count * int(rcount))
-            for _ in range(num_seats):
-                if student_index < student_count:
-                    student = students[student_index]
-                    student_index += 1
-                    output.writerow(student)
-            csvfile.flush()
+        room_students = []
+        num_seats = math.ceil(student_count / seat_count * int(rcount))
+        for _ in range(num_seats):
+            if student_index < student_count:
+                student = students[student_index]
+                student_index += 1
+                room_students.append(student)
 
-        # Check if the os.system call is successful
-        if os.system(f"./seatingchart.py {rname} {rname}") != 0:
-            print("\033[01;91mError: seatingchart.py failed\033[0m")
-            return
+        rosters.save_roster(room_students, ROOM_ROSTER_PATH)
+
+        try:
+            seatingchart.run(slug=rname, layout=rname)
+        except Exception as e:
+            print(traceback.format_exc())
+            print(RED + "Error: seatingchart.py failed" + END)
+            exit(1)
 
         shutil.copy(ROOM_CHART_PATH, HTML_ROOM_PATH)
 
@@ -118,7 +143,8 @@ def main():
     HTML_PDF_PATH.chmod(0o644)
     seat_csv_path.unlink()
 
-    print("\033[01;92mSuccess!\033[0m")
+    print(GREEN + "Success!" + END)
 
 if __name__ == "__main__":
     main()
+
