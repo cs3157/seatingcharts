@@ -21,7 +21,11 @@ def download_roster(course_id, canvas_api_key):
     # it in the roster
     response = [x for x in response if x['sortable_name'] != 'Student, Test']
 
-    return [(user['login_id'], user['sortable_name']) for user in response]
+    students = [(user['login_id'], user['sortable_name']) for user in response]
+
+    # Deduplicate based on UNI (no idea why canvas returns duplicates here)
+    seen = set()
+    return [s for s in students if not (s[0] in seen or seen.add(s[0]))]
 
 # Turns ('abc', 'def', '') into ('abc','def')
 def discard_last_if_empty(elements):
