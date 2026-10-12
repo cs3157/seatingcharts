@@ -51,8 +51,9 @@ def create_html_directory(html_path: Path) -> None:
     html_path.chmod(0o755)
 
 
-def init_seat_csv(seat_csv_path: Path) -> None:
-    seat_csv_path.write_text("Uni,Name,Seat,Room\n")
+def init_seat_csv(seat_csv_path: Path, include_room: bool) -> None:
+    header = "UNI,Name,Seat,Room\n" if include_room else "UNI,Name,Seat\n"
+    seat_csv_path.write_text(header)
     seat_csv_path.chmod(0o744)
 
 
@@ -75,14 +76,17 @@ def main():
 
     rename_images(Path("images"))
 
+    with ROOM_FILE.open('r') as f:
+        rooms = [r.strip().split() for r in f.readlines() if r.strip()]
+    
+    # don't make room column if there is only 1 room'
+    include_room = (len(rooms) > 1)
+
     create_html_directory(HTML_PATH)
 
     # Create the file
     seat_csv_path = HTML_PATH / "seat.csv"
-    init_seat_csv(seat_csv_path)
-
-    with ROOM_FILE.open('r') as f:
-        rooms = [r.strip().split() for r in f.readlines() if r.strip()]
+    init_seat_csv(seat_csv_path, include_room)
 
     print("Rooms:")
 
@@ -129,8 +133,8 @@ def main():
         with ROOM_LIST_PATH.open('r') as list_file:
             with seat_csv_path.open('a') as seat_file:
                 for line in list_file:
-                    modified_line = line.strip() + f",{rname}\n"
-                    seat_file.write(modified_line)
+                    suffix = f",{rname}\n" if include_room else ""
+                    seat_file.write(line.strip() + suffix + "\n")
 
         HTML_ROOM_PATH.chmod(0o644)
 
