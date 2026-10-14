@@ -8,14 +8,14 @@ A collection of scripts to produce a randomized set of seating assignments.
 * `seatingchart.py` - The core of this toolset. Creates seating assignments for a single room and produces HTML output. Originally written by Chris Mulligan (clm2186) for COMS W3157 Advanced Programming.
 * `go_brr.py` - Splits a larger roster into sub-rosters, one per room, and calls `seatingchart.py` for each one. Written by XXXurxo.
 * `mail.py` - Sends individual seating assignments to students by email
-* `imagedl.py` - Downloads students' photos. Written by Carl.
+* `imagedl.py` - Downloads students' photos. Written by Carl von Bonin and updated by Elizabeth Kushelevsky.
 * `rosters.py` - This file serves both as a utility to download student rosters from Canvas and as a local library to parse roster CSV files. Files read by this script are expected to have a header specifying the `SIS Login ID` column for UNIs and the `Student` column for full names. This header will also be added to downloaded rosters. Written by Carl.
 
 ## Usage
 
 1. Download the roster CSV file. This can either be done manually by going into the 'Grades' tab on Courseworks and selecting Export > Export Entire Gradebook or by using `rosters.py --download roster_filename.csv` (this requires a Canvas API key)
 
-2. Download the student images from the 'Photo Roster' tab. This can be achieved either with a browser extension, by using the "Save page as" functionality, or running the `imagedl.py` script.
+2. Download the student images from the 'Photo Roster' tab. This can be achieved either with a browser extension, by using the "Save page as" functionality, or running the `imagedl.py` script. You can see script options by running `./imagedl.py --help`.
 
 3. If necessary, edit the `rooms` file (see 'Room format' below)
 
