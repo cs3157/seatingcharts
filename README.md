@@ -110,7 +110,6 @@ You can now use mail.py to send individual emails to students with their seat as
 
 * If you haven't already, [generate a new device password](https://uniapp.cc.columbia.edu/acctmanage/devicepass). Note that this will invalidate your existing sessions, so you will need to sign in again.
 * `export LIONMAIL_DEVICE_PASS="abcdefg"`
-* In Google account settings, [allow less secure apps](https://cuit.columbia.edu/lionmail-allow-less-secure-apps). "Less secure" is their terminology for IMAP/SMTP clients.
 * Change the name and email in the script.
 
 

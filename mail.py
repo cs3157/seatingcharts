@@ -44,6 +44,11 @@ parser.add_argument("-r", "--reply_to",
         default='cucs3157-tas@googlegroups.com',
         help='reply-to email address, default="cucs3157-tas@googlegroups.com"')
 
+parser.add_argument("-t", "--test_uni",
+        type=str,
+        default='',
+        help='TA UNI to test-send the first assignment on the list to')
+
 args = parser.parse_args()
 
 #the message template, takes one variable which is replaced with the seat number
@@ -66,6 +71,41 @@ DEFAULT_BACKOFF = 30 # seconds
 next_backoff = DEFAULT_BACKOFF
 
 for uni, to_name, seat in students:
+    if args.test_uni != '':
+        # send a single test email to the TA running the script, then break
+        print(uni, msg % seat)
+        
+        to_columbia = f"{args.test_uni}@columbia.edu"
+        to_barnard = f"{args.test_uni}@barnard.edu"
+        recipients = [to_columbia, to_barnard]
+
+        email = MIMEMultipart()
+        email["From"] = f"\"{args.sender}\" <{args.from_addr}>"
+        email["To"] = ", ".join(recipients)
+        email["Subject"] = args.subject
+        email["Reply-To"] = args.reply_to
+
+        body = msg % seat
+        email.attach(MIMEText(body, "plain"))
+
+        text = email.as_string()
+
+        while True:
+            try:
+                if server == None:
+                    server = setup_server()
+                server.sendmail(args.from_addr, recipients, text)
+                time.sleep(1)
+                next_backoff = DEFAULT_BACKOFF
+                break
+            except (smtplib.SMTPException, smtplib.SMTPServerDisconnected) as e:
+                print(f"{e.smtp_code}: {e.smtp_error.decode()}")
+                print(f"Waiting {next_backoff} seconds")
+                time.sleep(next_backoff)
+                next_backoff *= 2
+                server = None
+        break
+
     print(uni, msg % seat)
 
     to_columbia = f"{uni}@columbia.edu"
