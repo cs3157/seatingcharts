@@ -56,6 +56,16 @@ def init_seat_csv(seat_csv_path: Path, include_room: bool) -> None:
     seat_csv_path.write_text(header)
     seat_csv_path.chmod(0o744)
 
+def load_unis(path) -> set:
+    # read list of UNIs from first/last file
+    if path is None:
+        return set()
+    with Path(path).open('r') as f:
+        return {line.strip() for line in f if line.strip() and not line.lstrip().startswith('#')}
+
+def write_unis(unis, path: Path):
+    # write set of unis to file in expected format
+    path.write_text("".join(f"{uni}\n" for uni in sorted(unis)))
 
 def main():
     print(ASCII_ART)
@@ -63,12 +73,28 @@ def main():
     parser = argparse.ArgumentParser(description="Go brrr with the seating charts")
     parser.add_argument("rooms", type=str, metavar='<rooms_file>')
     parser.add_argument("roster", type=str, metavar='<roster_file>')
+    parser.add_argument("--assign-first", type=str, metavar='<file>')
+    parser.add_argument("--assign-last", type=str, metavar='<file>')
     args = parser.parse_args()
 
     ROOM_FILE = Path(args.rooms)
 
     students = rosters.load_roster(args.roster)  
     print(f"Found {len(students)} students in the roster file")
+
+    # assign first and last if they're there
+    assign_first = load_unis(args.assign_first)
+    assign_last = load_unis(args.assign_last)
+
+    roster_unis = {uni for uni, _ in students}
+    for label, unis in (("assign-first", assign_first), ("assign-last", assign_last)):
+        missing = unis - roster_unis
+        if missing:
+            print(RED + f"Warning: {label} UNIs not found in roster: {",".join(sorted(missing))}" + END)
+    
+    overlap = assign_first & assign_last
+    if overlap:
+        print(RED + f"Warning: UNIs in both lists will be assigned first: {",".join(sorted(overlap))}" + END)
 
     random.shuffle(students)
     student_count = len(students)
@@ -79,7 +105,7 @@ def main():
     with ROOM_FILE.open('r') as f:
         rooms = [r.strip().split() for r in f.readlines() if r.strip()]
     
-    # don't make room column if there is only 1 room'
+    # don't make room column if there is only 1 room
     include_room = (len(rooms) > 1)
 
     create_html_directory(HTML_PATH)
@@ -120,6 +146,16 @@ def main():
                 room_students.append(student)
 
         rosters.save_roster(room_students, ROOM_ROSTER_PATH)
+
+        room_unis = {uni for uni, _ in room_students}
+        room_first = assign_first & room_unis
+        room_last = assign_last & room_unis
+
+        write_unis(room_first, ROOM_OUT_PATH / f"assign-first_{rname}.txt")
+        write_unis(room_last, ROOM_OUT_PATH / f"assign-last_{rname}.txt")
+
+        if room_first or room_last:
+            print(f"{rname}: {len(room_first)} assign_first, {len(room_last)} assign_last")
 
         try:
             seatingchart.run(slug=rname, layout=rname)
