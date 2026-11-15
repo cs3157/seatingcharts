@@ -169,7 +169,7 @@ def main():
         with ROOM_LIST_PATH.open('r') as list_file:
             with seat_csv_path.open('a') as seat_file:
                 for line in list_file:
-                    suffix = f",{rname}\n" if include_room else ""
+                    suffix = f",{rname}" if include_room else ""
                     seat_file.write(line.strip() + suffix + "\n")
 
         HTML_ROOM_PATH.chmod(0o644)
